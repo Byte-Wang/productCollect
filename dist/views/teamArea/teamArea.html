@@ -1,0 +1,255 @@
+<div class="layui-fluid" id="teamAreaTable">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <form class="layui-form" action="" lay-filter="component-form-group">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <button type="button" class="layui-btn" id="addTeamAreaBtn">新增</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <table class="layui-hide" id="teamArea-table" lay-filter="teamArea-table"></table>
+                    <div class="layui-card" id="teamArea-pagebar"></div>
+
+                    <script type="text/html" id="principalTpl">
+                        <span>{{d.principal_name}}</span>
+                    </script>
+
+                    <script type="text/html" id="updateTimeTpl">
+                        {{layui.util.toDateString(d.update_time * 1000, 'yyyy-MM-dd HH:mm:ss')}}
+                    </script>
+
+                    <script type="text/html" id="createTimeTpl">
+                        {{layui.util.toDateString(d.create_time * 1000, 'yyyy-MM-dd HH:mm:ss')}}
+                    </script>
+
+                    <script type="text/html" id="operationTpl">
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加/编辑团队区域的弹出层模板 -->
+<script type="text/html" id="addTeamAreaTpl">
+    <form class="layui-form" id="addTeamAreaForm" lay-filter="addTeamAreaForm" style="padding: 20px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">区域名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" required lay-verify="required" placeholder="请输入区域名称" class="layui-input">
+            </div>
+        </div>
+        <!-- <div class="layui-form-item">
+            <label class="layui-form-label">负责人</label>
+            <div class="layui-input-block">
+                <select name="principal">
+                    <option value="">请选择负责人</option>
+                </select>
+            </div>
+        </div> -->
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="addTeamAreaSubmit">保存</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</script>
+
+<script>
+let currentPageSize = 10;
+
+layui.use(['admin', 'table', 'form', 'laydate'], function(){
+    var admin = layui.admin
+    ,setter = layui.setter
+    ,table = layui.table
+    ,form = layui.form
+    ,$ = layui.$;
+
+    // 渲染表格
+    function renderTeamAreaTable(params) {
+        var table = layui.table;
+        var laypage = layui.laypage;
+
+        currentPageSize = params.limit;
+
+        getRequest("/index/getTeamArea", params, (res) => {
+            if (res.code != 1) {
+                layer.msg(res.msg || '数据获取失败', {icon: 2});
+                return;
+            }
+
+            var cloudData = res.data;
+
+            table.render({
+                elem: '#teamArea-table'
+                ,data: cloudData.list
+                ,cellMinWidth: 60
+                ,page: false
+                ,cols: [[
+                    {type: 'checkbox'},
+                    {field:'id', title:'ID', width:90},
+                    {field:'name', title:'区域名称', width:120},
+                    {field:'principal_name', title:'负责人', width:120, templet:'#principalTpl'},
+                    {field:'update_time', title:'更新时间', width:160, templet:'#updateTimeTpl'},
+                    {field:'create_time', title:'创建时间', width:160, templet:'#createTimeTpl'},
+                    {title:'操作', width:150, templet:'#operationTpl', fixed:'right'}
+                ]]
+            });
+
+            laypage.render({
+                elem: "teamArea-pagebar"
+                ,count: cloudData.total
+                ,curr: params.page
+                ,limit: params.limit
+                ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                ,jump: function(obj){
+                    if (params.page == obj.curr && params.limit == obj.limit) {
+                        return;
+                    }
+                    params.page = obj.curr;
+                    params.limit = obj.limit;
+                    renderTeamAreaTable(params);
+                }
+            });
+        });
+    }
+
+    // 新增按钮点击事件
+    $('#addTeamAreaBtn').on('click', function(){
+        // 获取负责人列表
+        getRequest("/auth.admin/select", {
+            isTree: true,
+            page: 1,
+            initKey: 'id',
+            initValue: '',
+            select: true,
+            quick_search: ''
+        }, function(res){
+            if(res.code == 1){
+                layer.open({
+                    type: 1,
+                    title: '新增团队区域',
+                    area: ['500px', '300px'],
+                    content: $('#addTeamAreaTpl').html(),
+                    success: function(){
+                        // 渲染下拉框数据
+                        let selectHtml = '<option value="">请选择负责人</option>';
+                        res.data.list.forEach(item => {
+                            selectHtml += `<option value="${item.id}">${item.nickname}</option>`;
+                        });
+                        $('select[name=principal]').html(selectHtml);
+                        form.render('select');
+                    }
+                });
+            }
+        });
+    });
+
+    // 表单提交事件
+    form.on('submit(addTeamAreaSubmit)', function(data){
+        let postData = {
+            ...data.field,
+            status: "1"
+        };
+
+
+        let url = '/index/addTeamArea';
+        if ($('#addTeamAreaForm').data('editId')) {
+            postData.id = $('#addTeamAreaForm').data('editId');
+            url = '/index/editTeamArea'
+        }
+        
+        postRequest(url, postData, function(res){
+            if(res.code == 1){
+                layer.msg(postData.id ? '修改成功' : '添加成功', {icon: 1});
+                layer.closeAll('page');
+                renderTeamAreaTable({page: 1, limit: currentPageSize});
+            } else {
+                layer.msg(res.msg || (postData.id ? '修改失败' : '添加失败'), {icon: 2});
+            }
+        });
+
+        return false;
+    });
+
+    // 表格工具条事件
+    table.on('tool(teamArea-table)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'edit'){
+            // 获取负责人列表
+            getRequest("/auth.admin/select", {
+                isTree: true,
+                page: 1,
+                initKey: 'id',
+                initValue: '',
+                select: true,
+                quick_search: ''
+            }, function(res){
+                if(res.code == 1){
+                    layer.open({
+                        type: 1,
+                        title: '编辑团队区域',
+                        area: ['500px', '300px'],
+                        content: $('#addTeamAreaTpl').html(),
+                        success: function(){
+                            // 渲染下拉框数据
+                            let selectHtml = '<option value="">请选择负责人</option>';
+                            res.data.list.forEach(item => {
+                                selectHtml += `<option value="${item.id}">${item.nickname}</option>`;
+                            });
+                            $('select[name=principal]').html(selectHtml);
+                            
+                            // 设置表单值
+                            form.val('addTeamAreaForm', {
+                                'name': data.name,
+                                'principal': data.principal_id
+                            });
+                            
+                            // 存储编辑ID
+                            $('#addTeamAreaForm').data('editId', data.id);
+                            
+                            form.render();
+                        }
+                    });
+                }
+            });
+        } else if(obj.event === 'del'){
+            layer.confirm('确认删除该记录？', function(index){
+                postRequest('/index/editTeamArea', {
+                    id: data.id,
+                    status: "0"
+                }, function(res){
+                    if(res.code == 1){
+                        layer.msg('删除成功', {icon: 1});
+                        obj.del();
+                        layer.close(index);
+                        // 刷新表格
+                        renderTeamAreaTable({page: 1, limit: currentPageSize});
+                    } else {
+                        layer.msg(res.msg || '删除失败', {icon: 2});
+                    }
+                });
+            });
+        }
+    });
+
+    // 初始化表格
+    renderTeamAreaTable({page: 1, limit: 10});
+});
+</script>
+
+<style>
+.layui-form-label {
+    width: 85px;
+}
+.layui-input-block {
+    margin-left: 115px;
+}
+</style> 

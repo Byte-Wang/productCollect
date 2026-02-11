@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 在 head 标签中添加 jsqr 库 -->
+<head>
+    <meta charset="UTF-8">
+    <title>OTP管理</title>
+    <link rel="stylesheet" href="../../../layui/css/layui.css" media="all">
+    <script src="dist/views/otp/qrcode.min.js"></script>
+    <!-- 引入 jsqr 库 -->
+    <script src="dist/views/otp/jsQR.min.js"></script>
+    <script src="dist/views/otp/sha1.min.js"></script>
+    <!-- 引入 speakeasy 库 -->
+    <!-- <script src="dist/views/otp/speakeasy.min.js"></script> -->
+</head>
+<body>
+    <div class="layui-fluid" id="otpTable">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-body">
+                        <form class="layui-form" action="" lay-filter="component-form-group">
+
+                            <div class="layui-form-item">
+
+                                <div class="layui-inline">
+                                    <label class="layui-form-label">编号:</label>  
+                                    <div class="layui-input-block">  
+                                      <input type="text" name="search_desc" placeholder="请输入编号" autocomplete="off" class="layui-input" onkeydown="if(event.keyCode === 13){document.getElementById('scanOtpBtn').click();}">  
+                                    </div>  
+                                </div>
+
+                                <div class="layui-inline" id="search-team-area-inline">
+                                    <label class="layui-form-label">大区:</label>  
+                                    <div class="layui-input-block">  
+                                      <select name="search_team_area" id="search_team_area" lay-filter="search_team_area" >
+                                      </select>  
+                                    </div>  
+                                </div>
+
+                                <div class="layui-inline">
+                                    <label class="layui-form-label">用户:</label>  
+                                    <div class="layui-input-block" style="width:220px;">  
+                                      <select id="search_user" name="search_user" lay-search="cs">
+                                        <option value="0">全部</option>
+                                      </select>
+                                    </div>  
+                                </div>
+
+                                <div class="layui-inline">    
+                                    <button type="button" class="layui-btn" id="scanOtpBtn" lay-submit lay-filter="search-submit">搜索</button>                                
+                                    <button type="button" class="layui-btn layui-btn-warm" id="batchSetAuthBtn" style="margin-left: 10px;">批量设置权限</button>
+                                    <button type="button" class="layui-btn layui-btn-normal" id="addOtpBtn">新增</button>
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                        <table class="layui-hide" id="otp-table" lay-filter="otp-table"></table>
+                        <div class="layui-card" id="otp-pagebar"></div>
+
+                        <script type="text/html" id="createTimeTpl">
+                            {{layui.util.toDateString(d.create_time * 1000, 'yyyy-MM-dd HH:mm:ss')}}
+                        </script>
+
+                        <script type="text/html" id="operationTpl">
+                            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="viewOtp">查看密码</a>
+                            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="setAuth">设置权限</a>
+                        </script>
+
+                        <script type="text/html" id="operationTplNoPermission">
+                            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="viewOtp">查看密码</a>
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加/编辑OTP的弹出层模板 -->
+    <script type="text/html" id="addOtpTpl">
+        <form class="layui-form" id="addOtpForm" lay-filter="addOtpForm" style="padding: 20px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">所属大区</label>
+                <div class="layui-input-block">
+                  <select name="team_area_id">
+                    <option value="">请选择所属大区</option>
+                  </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">编号</label>
+                <div class="layui-input-block">
+                    <input type="text" name="desc" required lay-verify="required" placeholder="请输入编号" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="store_name" required lay-verify="required" placeholder="请输入名称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">URI</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="uri" required lay-verify="required" placeholder="请输入URI" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <input type="file" id="qrCodeUpload" accept="image/*" style="display: none;">
+                    <button type="button" class="layui-btn" id="uploadQrCodeBtn">上传二维码</button>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密钥</label>
+                <div class="layui-input-block">
+                    <input type="text" name="secret" required lay-verify="required" placeholder="请输入密钥" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">账户</label>
+                <div class="layui-input-block">
+                    <input type="text" name="acount" required lay-verify="required" placeholder="请输入账户" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">类型</label>
+                <div class="layui-input-block">
+                    <input type="text" name="type" required lay-verify="required" placeholder="请输入类型" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">发行者</label>
+                <div class="layui-input-block">
+                    <input type="text" name="issuer" required lay-verify="required" placeholder="请输入发行者" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="addOtpSubmit">保存</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script >
+        let currentPageSize = 10;
+
+        layui.use(['admin', 'table', 'form', 'laydate'], function(){
+            var admin = layui.admin
+            ,setter = layui.setter
+            ,table = layui.table
+            ,form = layui.form
+            ,$ = layui.$;
+
+            var userInfo = layui.data('layuiAdmin').userInfo;
+            var hasPermiss = false;
+            if (userInfo.group_arr.includes(1) || userInfo.group_arr.includes(5)) {
+                hasPermiss = true;
+            } else {
+                $("#addOtpBtn").hide();
+            }
+
+            form.render('select');
+            if (userInfo.group_arr.includes(1) && serviceData.teamAreaList && serviceData.teamAreaList.length) {
+                $("#search_team_area").append(new Option("全部",0));
+                serviceData.teamAreaList.forEach((item)=>{
+                    $("#search_team_area").append(new Option(item.name,item.id));
+                });
+                form.render("select");
+
+                
+
+                $("#search-team-area-inline").show();
+            } else {
+                $("#search-team-area-inline").hide();
+
+            }
+
+            // 添加下拉框变化监听
+            form.on('select(search_team_area)', function() {
+                console.log("-------");
+                document.getElementById('scanOtpBtn').click();
+            });
+
+            // 填充用户下拉框
+            function fillUserOptions(list) {
+                var sel = layui.$('#search_user');
+                sel.empty();
+                sel.append(new Option('全部', 0));
+                list.forEach(function(user) {
+                    sel.append(new Option(`${user.nickname}(${user.username})`, user.id));
+                });
+                form.render('select');
+            }
+
+            if (window.serviceData && Array.isArray(serviceData.authList) && serviceData.authList.length) {
+                fillUserOptions(serviceData.authList);
+            } else if (typeof addListen === 'function') {
+                addListen(function(key, value) {
+                    if (key === 'authList' && Array.isArray(value)) {
+                        fillUserOptions(value);
+                    }
+                });
+            }
+
+            // 添加下拉框变化监听
+            form.on('submit(search-submit)', function(){
+                console.log("点击了查询");
+                let params = {page: 1, limit: currentPageSize};
+                // 使用固定方式获取表单值
+               
+
+                console.log("查询参数:", params);
+                renderOtpTable(params);
+                return false;
+            });
+
+            var tabbleCols = [ 
+                {type: 'checkbox'}, 
+                {field:'id', title:'ID', width:90}, 
+                {field:'teamAreaName', title:'所属大区', width:200}, 
+                {field:'desc', title:'编号', width:120}, 
+                {field:'store_name', title:'名称', width:200}, 
+                {field:'current_otp', title:'当前密码', width:200, templet: function(d) { 
+                    const token = generateTOTP(d.secret); 
+                    const currentTime = Math.floor(Date.now() / 1000); 
+                    const timeRemaining = 30 - (currentTime % 30); 
+                    return `<span id="current-otp-${d.id}" style="color: blue; font-weight: bold; font-size: x-large;">${token}</span> (<span id="countdown-${d.id}">${timeRemaining}</span>秒)`; 
+                }}, 
+                {field:'acount', title:'账户', width:300}, 
+                {field:'userList', title:'已授权用户', width:300}, 
+                {field:'create_time', title:'创建时间', width:160, templet:'#createTimeTpl'}, 
+                
+            ]; 
+
+            if (hasPermiss) { 
+                tabbleCols.push({ 
+                    field:'uri', 
+                    title:'URI', 
+                    width:120, 
+                    templet: function(d) { 
+                        var divId = 'qrcode-' + d.id; 
+                        var hoverId = 'hover-qrcode-' + d.id; 
+                        return `<span 
+                                    onmouseover="showQRCode('${divId}', '${d.uri}')" 
+                                    onmouseout="hideQRCode('${divId}')" 
+                                    style="cursor: pointer;" 
+                                > 
+                                    ${d.uri} 
+                                </span> 
+                                <div id="${divId}" style="display: none; position: fixed; z-index: 999; background: white; padding: 10px; border: 1px solid #ccc;"></div>`; 
+                    } 
+                }); 
+                tabbleCols.push({field:'secret', title:'密钥', width:120}); 
+                tabbleCols.push({title:'操作', width:300, templet:'#operationTpl', fixed:'right'}); 
+            } else { 
+                tabbleCols.push({title:'操作', width:300, templet:'#operationTplNoPermission', fixed:'right'}); 
+            } 
+
+            // 定时器管理器，用于存储每个 OTP 记录的定时器 ID
+            var otpTimers = {};  // 格式: { id: timerId }
+
+            // 渲染表格
+            function renderOtpTable(params) {
+                var table = layui.table;
+                var laypage = layui.laypage;
+
+                var formData = form.val('component-form-group');
+                console.log("表单数据:", formData);
+
+                if (formData.search_desc != "") {
+                    params.desc = formData.search_desc;
+                }
+
+                if (formData.search_team_area != 0) {
+                    params.team_area_id = formData.search_team_area;
+                }
+
+                if (formData.search_user != 0) {
+                    params.permissionId = formData.search_user;
+                }
+
+                currentPageSize = params.limit;
+
+                getRequest("/index/getOtps", params, (res) => {
+                    if (res.code != 1) {
+                        layer.msg(res.msg || '数据获取失败', {icon: 2});
+                        return;
+                    }
+
+                    var cloudData = res.data;
+
+                    // 清除所有旧的定时器
+                    Object.keys(otpTimers).forEach(id => {
+                        clearInterval(otpTimers[id]);
+                    });
+                    otpTimers = {};
+
+                    table.render({
+                        elem: '#otp-table'
+                        ,data: cloudData.list
+                        ,cellMinWidth: 60
+                        ,page: false
+                        ,cols: [tabbleCols]
+                    });
+
+                    cloudData.list.forEach((d, index) => {
+                        function updateDisplay() {
+                            // console.log('开始更新显示，当前数据:', d);
+                            const token = generateTOTP(d.secret);
+                            // console.log('生成的 OTP 令牌:', token);
+                            const currentTime = Math.floor(Date.now() / 1000);
+                            const timeRemaining = 30 - (currentTime % 30);
+                           
+                            $(`#countdown-${d.id}`).text(timeRemaining);
+                            $(`#current-otp-${d.id}`).text(token);
+                        }
+                        // 初始更新
+                        updateDisplay();
+                        // 每秒更新一次显示，并保存定时器 ID
+                        otpTimers[d.id] = setInterval(updateDisplay, 1000);
+                    });
+
+                    laypage.render({
+                        elem: "otp-pagebar"
+                        ,count: cloudData.total
+                        ,curr: params.page
+                        ,limit: params.limit
+                        ,limits: [10,20,50,100, 200, 500]
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                        ,jump: function(obj){
+                            if (params.page == obj.curr && params.limit == obj.limit) {
+                                return;
+                            }
+                            params.page = obj.curr;
+                            params.limit = obj.limit;
+                            renderOtpTable(params);
+                        }
+                    });
+                });
+            }
+
+            // 新增按钮点击事件
+            $('#addOtpBtn').on('click', function(){
+                layer.open({
+                    type: 1,
+                    title: '新增OTP',
+                    area: ['600px', '500px'],
+                    content: $('#addOtpTpl').html(),
+                    success: function(){
+                        let teamAreaSelectHtml = '<option value="">所属大区</option>';
+                        serviceData.teamAreaList.forEach(item => {
+                            teamAreaSelectHtml += `<option value="${item.id}">${item.name}</option>`;
+                        });
+                        $('select[name=team_area_id]').html(teamAreaSelectHtml);
+                        
+                        form.render();
+                    }
+                });
+            });
+
+            // 表单提交事件
+            form.on('submit(addOtpSubmit)', function(data){
+                let postData = {
+                    ...data.field,
+                    status: "1"
+                };
+
+                let url = '/index/addOtp';
+                if ($('#addOtpForm').data('editId')) {
+                    postData.id = $('#addOtpForm').data('editId');
+                    url = '/index/editOtp'
+                }
+                
+                postRequest(url, postData, function(res){
+                    if(res.code == 1){
+                        layer.msg(postData.id ? '修改成功' : '添加成功', {icon: 1});
+                        layer.closeAll('page');
+                        renderOtpTable({page: 1, limit: currentPageSize});
+                    } else {
+                        layer.msg(res.msg || (postData.id ? '修改失败' : '添加失败'), {icon: 2});
+                    }
+                });
+
+                return false;
+            });
+
+// 批量设置权限按钮点击事件
+            $('#batchSetAuthBtn').on('click', function(){
+                if (!hasPermiss) {
+                    layer.msg('您没有权限进行此操作', {icon: 2});
+                    return;
+                }
+
+                // 获取选中的行
+                var checkStatus = table.checkStatus('otp-table');
+                var selectedData = checkStatus.data;
+                
+                if (selectedData.length === 0) {
+                    layer.msg('请选择要设置权限的记录', {icon: 2});
+                    return;
+                }
+
+                // 收集选中的记录ID
+                var selectedIds = selectedData.map(function(item) {
+                    return item.id;
+                });
+
+                // 获取所有已授权用户的并集（用于显示在用户列表中）
+                var allAuthorizedUsers = new Set();
+                selectedData.forEach(function(item) {
+                    if (item.userList) {
+                        const userListArray = item.userList.split('、');
+                        userListArray.forEach(function(user) {
+                            allAuthorizedUsers.add(user);
+                        });
+                    }
+                });
+
+                // 弹出弹窗（复用现有设置权限的界面）
+                layui.use(['admin', 'table', 'form', 'layer'], function() {
+                    var admin = layui.admin;
+                    var table = layui.table;
+                    var form = layui.form;
+                    var layer = layui.layer;
+                    var $ = layui.$;
+
+                    let userList = '';
+                    if (allAuthorizedUsers.size > 0) {
+                        Array.from(allAuthorizedUsers).forEach(function(user) {
+                            userList += `<span class="user-card">${user}<span class="delete-btn" onclick="this.parentElement.remove()">x</span></span>`;
+                        });
+                    }
+
+                    layer.open({
+                        type: 1,
+                        title: '批量设置权限 - 已选择 ' + selectedIds.length + ' 条记录',
+                        area: ['800px', '650px'],
+                        content: `
+                            <div class="layui-form" style="padding: 12px;">
+                                <div class="layui-form-item">
+                                    <div class="layui-inline">
+                                        <input type="text" name="searchUser" placeholder="搜索用户" class="layui-input">
+                                    </div>
+                                    <button type="button" class="layui-btn" id="searchUserBtn">搜索</button>
+                                    <button class="layui-btn" id="confirmAuthBtn">确认授权</button>
+                                </div>
+                                <div class="layui-form-item">
+                                    <div class="layui-inline has-permission-user-list">
+                                    ${userList}
+                                    </div>
+                                </div>
+                                <table class="layui-hide" id="authUserTable" lay-filter="authUserTable"></table>
+                                <div class="layui-card" id="user-pagebar"></div>
+                            </div>
+                        `,
+                        success: function() {
+                            
+
+                            function renderUserTable(params){
+                                // 使用 getRequest 调用接口
+                                getRequest("/auth.admin/index", params, function(res) {
+                                    if (res.code == 1) {
+                                        table.render({
+                                            elem: '#authUserTable',
+                                            data: res.data.list,
+                                            title: '用户数据',
+                                            cellMinWidth: 60,
+                                            cellMinHeight: 80,
+                                            page: false,
+                                            limit: 10,
+                                            cols: [[
+                                                {field: 'id', title: 'ID', width:90},
+                                                {field: 'username', title: '用户名', width:200},
+                                                {field:'group_name_arr', title:'角色', width:100, templet: function(d){
+                                                    return d.group_name_arr.join(', ');
+                                                }},
+                                                {field:'team_name', title:'所属团队', templet: function(d){
+                                                    let teamAreaInfo = "";
+                                                    if (d.team_area_info) {
+                                                        teamAreaInfo = "负责【" + d.team_area_info.name + "】区";
+                                                    } else if (d.team && d.team.team_area_name) {
+                                                        teamAreaInfo = "【" + d.team.team_area_name + "】区";
+                                                    }
+
+                                                    let teamInfo = ''
+                                                    if (d.manage_team) {
+                                                        if (teamAreaInfo != "") {
+                                                        teamAreaInfo += " - ";
+                                                        }
+                                                        teamInfo = "负责【" + d.manage_team.name + "】团队";
+                                                    } else if (d.team && d.team.name) {
+                                                        if (teamAreaInfo != "") {
+                                                        teamAreaInfo += " - ";
+                                                        }
+                                                        teamInfo = "【"+d.team.name+"】团队";
+                                                    } 
+
+                                                    if (teamAreaInfo == "" && teamInfo == ""){
+                                                        teamInfo = '<span style="color: #cdcbcb;">无归属</span>'
+                                                    }
+                                                    
+                                                    return teamAreaInfo + teamInfo;
+                                                }},
+                                                {title:'操作', width:90,fixed:'right', templet: function(d){
+                                                    return '<a class="layui-btn layui-btn-xs" lay-event="add">添加</a>'
+                                                }}
+                                            ]],
+                                            done: function () {
+                                                // 表格渲染完成后的操作
+                                            }
+                                        });
+
+                                        var cloudData = res.data;
+
+                                        layui.laypage.render({
+                                            elem: "user-pagebar",
+                                            count: cloudData.total,
+                                            curr: params.page,
+                                            limit: params.limit,
+                                            layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip'], // 功能布局
+                                            jump: function(obj){
+                                                console.log('当前在第'+ params.page + '页，目标是第'+obj.curr+'页')
+                                                if (params.page == obj.curr && params.limit == obj.limit) {
+                                                console.log('不加载')
+                                                return;
+                                                }
+                                                console.log('开始加载')
+                                                params.page = obj.curr;
+                                                params.limit = obj.limit;
+                                                renderUserTable(params);
+                                            }
+                                        });
+                                    } else {
+                                        layer.msg(res.msg || '数据获取失败', {icon: 2});
+                                    }
+                                });
+                    
+                            }
+
+                            table.on('tool(authUserTable)', function(userObj){
+                                var userData = userObj.data;
+                                if(userObj.event === 'add'){
+                                    
+                                    let newUser = `<span class="user-card">[${userData.id}]${userData.username}<span class="delete-btn" onclick="this.parentElement.remove()">x</span></span>`;
+                                    // 检查是否存在相同用户 ID 的卡片
+                                    $(`.has-permission-user-list .user-card`).each(function() {
+                                        const existingUserId = $(this).text().match(/\[(\d+)\]/)?.[1];
+                                        if (existingUserId === userData.id.toString()) {
+                                            $(this).remove();
+                                        }
+                                    });
+                                    $(`.has-permission-user-list`).append(newUser);
+                                    
+                                }
+                            });
+
+                            // 初始化表格
+                            var params = {
+                                page: 1,
+                                limit: 10
+                            };
+                            renderUserTable(params);
+
+                            // 为搜索输入框添加回车事件
+                            $('input[name="searchUser"]').on('keydown', function(e) {
+                                if (e.key === 'Enter' || e.keyCode === 13) {
+                                    $('#searchUserBtn').click();
+                                }
+                            });
+
+                            // 搜索按钮点击事件
+                            $('#searchUserBtn').on('click', function() {
+                                var searchValue = $('[name="searchUser"]').val();
+
+                                var searchList = [];
+                                if (searchValue) {
+                                    searchList.push('{"field":"username","val":"'+searchValue+'","operator":"LIKE"}');
+                                }
+                                renderUserTable({
+                                    page: 1,
+                                    limit: 10,
+                                    "search[]": searchList
+                                });
+                               
+                            });
+                
+                            // 确认授权按钮点击事件
+                            $('#confirmAuthBtn').on('click', function() {
+                                let hasPermissionUserList = "";
+                                $(`.has-permission-user-list .user-card`).each(function() {
+                                    const existingUserId = $(this).text().match(/\[(\d+)\]/)?.[1];
+                                    hasPermissionUserList = hasPermissionUserList + existingUserId + ",";
+                                });
+                                console.log(hasPermissionUserList);
+
+                                if (hasPermissionUserList == "") {
+                                    layer.msg("请选择授权用户", {icon: 2});
+                                    return;
+                                }
+
+                                // 批量处理选中的记录
+                                let processedCount = 0;
+                                let totalCount = selectedIds.length;
+                                let failedCount = 0;
+                                
+                                selectedIds.forEach(function(id) {
+                                    let postData = {
+                                        "permission_admin_ids": hasPermissionUserList,
+                                        "id": id,
+                                    };
+
+                                    let url = '/index/editOtp';
+                                    
+                                    postRequest(url, postData, function(res){
+                                        processedCount++;
+                                        if (res.code != 1) {
+                                            failedCount++;
+                                        }
+                                        
+                                        // 当所有请求都完成时，显示结果
+                                        if (processedCount === totalCount) {
+                                            if (failedCount === 0) {
+                                                layer.msg('批量设置权限成功', {icon: 1});
+                                            } else {
+                                                layer.msg(`批量设置完成，其中 ${failedCount} 条记录失败`, {icon: 2});
+                                            }
+                                            layer.closeAll('page');
+                                            renderOtpTable({page: 1, limit: currentPageSize});
+                                        }
+                                    });
+                                });
+                            });
+                        }
+                    });
+                });
+            });
+
+
+
+            // 表格工具条事件
+            table.on('tool(otp-table)', function(obj){
+                var data = obj.data;
+                if(obj.event === 'edit'){
+                    layer.open({
+                        type: 1,
+                        title: '编辑OTP',
+                        area: ['600px', '500px'],
+                        content: $('#addOtpTpl').html(),
+                        success: function(){
+                           
+                            
+                            // 存储编辑ID
+                            $('#addOtpForm').data('editId', data.id);
+
+                            let teamAreaSelectHtml = '<option value="">所属大区</option>';
+                            serviceData.teamAreaList.forEach(item => {
+                                teamAreaSelectHtml += `<option value="${item.id}">${item.name}</option>`;
+                            });
+                            $('select[name=team_area_id]').html(teamAreaSelectHtml);
+                            
+
+                             // 设置表单值
+                            form.val('addOtpForm', {
+                                'desc': data.desc,
+                                'uri': data.uri,
+                                'secret': data.secret,
+                                'acount': data.acount,
+                                'type': data.type,
+                                'issuer': data.issuer,
+                                'status': data.status,
+                                'team_area_id': data.team_area_id || '',
+                                'store_name': data.store_name || '',
+                            });
+
+                            form.render();
+                        }
+                    });
+                } else if(obj.event === 'del'){
+                    layer.confirm('确认删除该记录？', function(index){
+                        postRequest('/index/editOtp', {
+                            id: data.id,
+                            status: "0"
+                        }, function(res){
+                            if(res.code == 1){
+                                layer.msg('删除成功', {icon: 1});
+                                obj.del();
+                                layer.close(index);
+                                // 刷新表格
+                                renderOtpTable({page: 1, limit: currentPageSize});
+                            } else {
+                                layer.msg(res.msg || '删除失败', {icon: 2});
+                            }
+                        });
+                    });
+                } else if(obj.event === 'viewOtp'){
+                    let timer;
+                    const modal = layer.open({
+                        type: 1,
+                        title: '一次性密码',
+                        area: ['500px', '350px'],
+                        content: `
+                            <div style="padding: 2rem; background-color: #f5f5f5; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+                                <p style="font-size: 1.125rem; color: #333; margin-bottom: 1.25rem; font-weight: 500;">账号：${data.acount}</p>
+                                <p style="font-size: 1.125rem; color: #333; margin-bottom: 0.75rem; font-weight: 500;">说明：${data.desc}</p>
+                                <div style="background-color: #fff; padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+                                    <p style="font-size: 1.125rem; color: #333; margin: 0;">当前密码: <span id="otpCode" style="font-weight: bold; color: #2196F3; font-size: 3rem; letter-spacing: 2px;"></span></p>
+                                </div>
+                                <p style="font-size: 1.125rem; color: #666; margin: 0;">剩余时间: <span id="otpTimeLeft" style="font-weight: bold; color: #f44336;"></span> 秒</p>
+                            </div>
+                        `,
+                        success: function() {
+                            function updateOtp() {
+                                const token = generateTOTP(data.secret);
+                                const now = Math.floor(Date.now() / 1000);
+                                const timeLeft = 30 - (now % 30);
+
+                                $('#otpCode').text(token);
+                                $('#otpTimeLeft').text(timeLeft);
+                            }
+
+                            // 初始更新
+                            updateOtp();
+                            // 每秒更新一次
+                            timer = setInterval(updateOtp, 1000);
+                        },
+                        end: function() {
+                            // 关闭模态框时清除定时器
+                            clearInterval(timer);
+                        }
+                    });
+                } else if(obj.event === 'setAuth'){
+                    // 加载 layui 模块
+                    layui.use(['admin', 'table', 'form', 'layer'], function() {
+                        var admin = layui.admin;
+                        var table = layui.table;
+                        var form = layui.form;
+                        var layer = layui.layer;
+                        var $ = layui.$;
+
+                        console.log(data);
+
+                        let userList = ``;
+                        if (data.userList) {
+                            // 将字符串按顿号分隔成数组
+                            const userListArray = data.userList.split('、');
+                            userListArray.forEach((item) => {
+                                userList += `<span class="user-card">${item}<span class="delete-btn" onclick="this.parentElement.remove()">x</span></span>`;
+                            });
+                        }
+
+                        // 弹出弹窗
+                        layer.open({
+                            type: 1,
+                            title: '设置授权用户',
+                            area: ['800px', '650px'],
+                            content: `
+                                <div class="layui-form" style="padding: 12px;">
+                                    <div class="layui-form-item">
+                                        <div class="layui-inline">
+                                            <input type="text" name="searchUser" placeholder="搜索用户" class="layui-input">
+                                        </div>
+                                        <button type="button" class="layui-btn" id="searchUserBtn">搜索</button>
+                                        <button class="layui-btn" id="confirmAuthBtn">确认授权</button>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <div class="layui-inline has-permission-user-list">
+                                        ${userList}
+                                        </div>
+                                    </div>
+                                    <table class="layui-hide" id="authUserTable" lay-filter="authUserTable"></table>
+                                    <div class="layui-card" id="user-pagebar"></div>
+                                </div>
+                            `,
+                            success: function() {
+                                
+
+                                function renderUserTable(params){
+
+                                    // 使用 getRequest 调用接口
+                                    getRequest("/auth.admin/index", params, function(res) {
+                                        if (res.code == 1) {
+                                            table.render({
+                                                elem: '#authUserTable',
+                                                data: res.data.list,
+                                                title: '用户数据',
+                                                cellMinWidth: 60,
+                                                cellMinHeight: 80,
+                                                page: false,
+                                                limit: 10,
+                                                cols: [[
+                                                    {field: 'id', title: 'ID', width:90},
+                                                    {field: 'username', title: '用户名', width:200},
+                                                    {field:'group_name_arr', title:'角色', width:100, templet: function(d){
+                                                        return d.group_name_arr.join(', ');
+                                                    }},
+                                                    {field:'team_name', title:'所属团队', templet: function(d){
+                                                        let teamAreaInfo = "";
+                                                        if (d.team_area_info) {
+                                                            teamAreaInfo = "负责【" + d.team_area_info.name + "】区";
+                                                        } else if (d.team && d.team.team_area_name) {
+                                                            teamAreaInfo = "【" + d.team.team_area_name + "】区";
+                                                        }
+
+                                                        let teamInfo = ''
+                                                        if (d.manage_team) {
+                                                            if (teamAreaInfo != "") {
+                                                            teamAreaInfo += " - ";
+                                                            }
+                                                            teamInfo = "负责【" + d.manage_team.name + "】团队";
+                                                        } else if (d.team && d.team.name) {
+                                                            if (teamAreaInfo != "") {
+                                                            teamAreaInfo += " - ";
+                                                            }
+                                                            teamInfo = "【"+d.team.name+"】团队";
+                                                        } 
+
+                                                        if (teamAreaInfo == "" && teamInfo == ""){
+                                                            teamInfo = '<span style="color: #cdcbcb;">无归属</span>'
+                                                        }
+                                                        
+                                                        return teamAreaInfo + teamInfo;
+                                                    }},
+                                                    {title:'操作', width:90,fixed:'right', templet: function(d){
+                                                        return '<a class="layui-btn layui-btn-xs" lay-event="add">添加</a>'
+                                                    }}
+                                                ]],
+                                                done: function () {
+                                                    // 表格渲染完成后的操作
+                                                }
+                                            });
+
+                                            var cloudData = res.data;
+
+                                            layui.laypage.render({
+                                                elem: "user-pagebar",
+                                                count: cloudData.total,
+                                                curr: params.page,
+                                                limit: params.limit,
+                                                layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip'], // 功能布局
+                                                jump: function(obj){
+                                                    console.log('当前在第'+ params.page + '页，目标是第'+obj.curr+'页')
+                                                    if (params.page == obj.curr && params.limit == obj.limit) {
+                                                    console.log('不加载')
+                                                    return;
+                                                    }
+                                                    console.log('开始加载')
+                                                    params.page = obj.curr;
+                                                    params.limit = obj.limit;
+                                                    renderUserTable(params);
+                                                }
+                                            });
+                                        } else {
+                                            layer.msg(res.msg || '数据获取失败', {icon: 2});
+                                        }
+                                    });
+                        
+                                }
+
+                                table.on('tool(authUserTable)', function(userObj){
+                                    var userData = userObj.data;
+                                    if(userObj.event === 'add'){
+                                        
+                                        let newUser = `<span class="user-card">[${userData.id}]${userData.username}<span class="delete-btn" onclick="this.parentElement.remove()">x</span></span>`;
+                                        // 检查是否存在相同用户 ID 的卡片
+                                        $(`.has-permission-user-list .user-card`).each(function() {
+                                            const existingUserId = $(this).text().match(/\[(\d+)\]/)?.[1];
+                                            if (existingUserId === userData.id.toString()) {
+                                                $(this).remove();
+                                            }
+                                        });
+                                        $(`.has-permission-user-list`).append(newUser);
+                                        
+                                    }
+                                });
+
+                                // 初始化表格
+                                var params = {
+                                    page: 1,
+                                    limit: 10
+                                };
+                                renderUserTable(params);
+
+                                // 为搜索输入框添加回车事件
+                                $('input[name="searchUser"]').on('keydown', function(e) {
+                                    if (e.key === 'Enter' || e.keyCode === 13) {
+                                        $('#searchUserBtn').click();
+                                    }
+                                });
+
+                                // 搜索按钮点击事件
+                                $('#searchUserBtn').on('click', function() {
+                                    var searchValue = $('[name="searchUser"]').val();
+
+                                    var searchList = [];
+                                    if (searchValue) {
+                                        searchList.push('{"field":"username","val":"'+searchValue+'","operator":"LIKE"}');
+                                    }
+                                    renderUserTable({
+                                        page: 1,
+                                        limit: 10,
+                                        "search[]": searchList
+                                    });
+                                   
+                                });
+                    
+                                // 确认授权按钮点击事件
+                                $('#confirmAuthBtn').on('click', function() {
+                                    let hasPermissionUserList = "";
+                                    $(`.has-permission-user-list .user-card`).each(function() {
+                                        const existingUserId = $(this).text().match(/\[(\d+)\]/)?.[1];
+                                        hasPermissionUserList = hasPermissionUserList + existingUserId + ",";
+                                    });
+                                    console.log(hasPermissionUserList);
+
+                                    if (hasPermissionUserList == "") {
+                                        layer.msg("请选择授权用户", {icon: 2});
+                                        return;
+                                    }
+
+
+                                    let postData = {
+                                        "permission_admin_ids": hasPermissionUserList,
+                                        "id": data.id,
+                                    };
+
+                                    let url = '/index/editOtp';
+                                    
+                                    postRequest(url, postData, function(res){
+                                        if(res.code == 1){
+                                            layer.msg(postData.id ? '修改成功' : '添加成功', {icon: 1});
+                                            layer.closeAll('page');
+                                            renderOtpTable({page: 1, limit: currentPageSize});
+                                        } else {
+                                            layer.msg(res.msg || (postData.id ? '修改失败' : '添加失败'), {icon: 2});
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+
+            // 初始化表格
+            renderOtpTable({page: 1, limit: 10});
+
+
+
+            // 绑定上传按钮点击事件
+            $(document).on('click', '#uploadQrCodeBtn', function() {
+                $('#qrCodeUpload').click();
+            });
+
+            // 处理文件上传
+            $(document).on('change', '#qrCodeUpload', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                        if (code) {
+                            // 对解析的内容进行 urlDecode
+                            let uri = decodeURIComponent(code.data);
+                            $('input[name="uri"]').val(uri);
+                            form.render('input');
+
+                            // 校验 otpauth 协议格式
+                            const otpauthRegex = /^otpauth:\/\/([^\/]+)\/([^?]+)\?([^]+)$/;
+                            const match = uri.match(otpauthRegex);
+                            if (match) {
+                                const type = match[1];
+                                const account = match[2];
+                                const params = new URLSearchParams(match[3]);
+                                const secret = params.get('secret');
+                                const issuer = params.get('issuer');
+
+                                // 填充字段
+                                if (secret) {
+                                    $('input[name="secret"]').val(secret);
+                                }
+                                if (account) {
+                                    $('input[name="acount"]').val(account);
+                                }
+                                if (type) {
+                                    $('input[name="type"]').val(type);
+                                }
+                                if (issuer) {
+                                    $('input[name="issuer"]').val(issuer);
+                                }
+
+                                form.render('input');
+                            } else {
+                                layer.msg('解析的 URL 不是有效的 otpauth 协议格式', {icon: 2});
+                            }
+                        } else {
+                            layer.msg('未识别到二维码', {icon: 2});
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
+
+            // 监听select中input的点击事件，清空内容
+            $(document).on('click', '.layui-select-title input', function() {
+                var $input = $(this);
+                $input.val('').attr('placeholder', '请选择');
+                console.log('已清空select input内容');
+            });
+        });
+
+        function showQRCode(divId, uri) {
+            const div = document.getElementById(divId);
+            console.log("准备加载二维码");
+            if (!div.querySelector('canvas')) {
+                new QRCode(div, {
+                    text: uri,
+                    width: 150,
+                    height: 150,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+                console.log("加载二维码");
+            }
+            div.style.display = 'block';
+        }
+
+        function hideQRCode(divId) {
+            const div = document.getElementById(divId);
+            div.style.display = 'none';
+        }
+
+
+        // Base32解码函数
+    function base32Decode(base32String) {
+      if (!base32String) return new Uint8Array();
+      
+      // 移除空格和等号填充
+      base32String = base32String.trim().replace(/=+$/, '').toUpperCase();
+      
+      const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+      let bits = 0;
+      let value = 0;
+      let index = 0;
+      const output = new Uint8Array(Math.floor(base32String.length * 5 / 8));
+      
+      for (let i = 0; i < base32String.length; i++) {
+        const char = base32String.charAt(i);
+        const charIndex = base32Chars.indexOf(char);
+        
+        if (charIndex === -1) {
+          throw new Error('Invalid character in base32 string: ' + char);
+        }
+        
+        value = (value << 5) | charIndex;
+        bits += 5;
+        
+        if (bits >= 8) {
+          output[index++] = (value >>> (bits - 8)) & 0xff;
+          bits -= 8;
+        }
+      }
+      
+      return output;
+    }
+
+    // HMAC-SHA1实现
+    function hmacSha1(key, message) {
+      const blockSize = 64; // SHA-1块大小为64字节
+      
+      // 如果密钥长度超过块大小，则进行哈希处理
+      if (key.length > blockSize) {
+        key = sha1(key);
+        key = new Uint8Array(key.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+      }
+      
+      // 填充密钥到块大小
+      const oKeyPad = new Uint8Array(blockSize);
+      const iKeyPad = new Uint8Array(blockSize);
+      
+      for (let i = 0; i < blockSize; i++) {
+        const keyByte = i < key.length ? key[i] : 0;
+        oKeyPad[i] = 0x5C ^ keyByte;
+        iKeyPad[i] = 0x36 ^ keyByte;
+      }
+      
+      // 计算inner hash
+      const inner = new Uint8Array(iKeyPad.length + message.length);
+      inner.set(iKeyPad);
+      inner.set(message, iKeyPad.length);
+      const innerHash = sha1(inner);
+      
+      // 计算outer hash
+      const innerHashBytes = new Uint8Array(innerHash.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+      const outer = new Uint8Array(oKeyPad.length + innerHashBytes.length);
+      outer.set(oKeyPad);
+      outer.set(innerHashBytes, oKeyPad.length);
+      
+      return sha1(outer);
+    }
+        // 生成TOTP验证码
+    function generateTOTP(secret, digits = 6, period = 30) {
+      try {
+        // 解码Base32密钥
+        const key = base32Decode(secret);
+        
+        // 计算当前时间步
+        const currentTime = Math.floor(Date.now() / 1000);
+        let timeStep = Math.floor(currentTime / period); // 改为let声明
+        
+        // 将时间步转换为8字节数组（大端序）
+        const timeBuffer = new ArrayBuffer(8);
+        const timeArray = new Uint8Array(timeBuffer);
+        for (let i = 7; i >= 0; i--) {
+          timeArray[i] = timeStep & 0xff;
+          timeStep = timeStep >>> 8;
+        }
+        
+        // 计算HMAC-SHA1
+        const hmacResult = hmacSha1(key, timeArray);
+        
+        // 将哈希结果转换为字节数组
+        const hmacBytes = new Uint8Array(hmacResult.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+        
+        // 动态截断
+        const offset = hmacBytes[19] & 0x0F;
+        const binary = 
+          ((hmacBytes[offset] & 0x7F) << 24) |
+          ((hmacBytes[offset + 1] & 0xFF) << 16) |
+          ((hmacBytes[offset + 2] & 0xFF) << 8) |
+          (hmacBytes[offset + 3] & 0xFF);
+        
+        // 生成验证码
+        const code = binary % Math.pow(10, digits);
+        return code.toString().padStart(digits, '0');
+      } catch (error) {
+        console.error('生成TOTP时出错:', error);
+        return null;
+      }
+    }
+    
+
+    </script>
+
+    <style>
+        .layui-form-label {
+            width: 85px;
+        }
+        .layui-input-block {
+            margin-left: 115px;
+        }
+
+        .user-card {
+            background-color: #999999;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-right: 15px;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2px;
+        }
+        
+        .delete-btn {
+            margin-left: 8px;
+            background: #ff0000;
+            border-radius: 12px;
+            cursor: pointer;
+            padding: 0 6px;
+            font-size: 18px;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+        }
+
+        .layui-table-fixed{
+            z-index:10;
+        }
+    </style>
+</body>
+</html>

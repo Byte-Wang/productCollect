@@ -1,0 +1,489 @@
+
+<div class="layui-fluid" id="productTable">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-body">
+          <form class="layui-form" action="" lay-filter="component-form-group">
+            <!-- <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数</button>
+            <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+            <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全</button> -->
+            <div class="layui-form-item">  
+              <div class="layui-inline">
+                <label class="layui-form-label">ASIN:</label>  
+                <div class="layui-input-block">  
+                  <input type="text" name="asin" placeholder="请输入ASIN" autocomplete="off" class="layui-input">  
+                </div>  
+              </div>
+              <div class="layui-inline">
+                <label class="layui-form-label">产品名称:</label>  
+                <div class="layui-input-block">  
+                  <input type="text" name="product_name" placeholder="请输入产品名称" autocomplete="off" class="layui-input">  
+                </div>  
+              </div>
+              <div class="layui-inline">
+                <label class="layui-form-label">站点:</label>  
+                <div class="layui-input-block">  
+                  <select name="station_id" id="site-select" >  
+                  </select>  
+                </div>  
+              </div>
+              <div class="layui-inline">
+                <label class="layui-form-label">状态:</label>  
+                <div class="layui-input-block">  
+                  <select name="state" id="status-select" >  
+                    <option value="">全部</option>
+                    <option value="0">待审核</option>
+                    <option value="1">初审通过</option>
+                    <option value="2">审核驳回</option>
+                    <option value="3">审核通过</option>
+                    <option value="4">待二审</option>
+                    <option value="5">异议二审</option> 
+                    <option value="-1">无效数据</option>
+                  </select>  
+                </div>  
+              </div>
+            </div> 
+            <div class="layui-form-item">  
+              <div class="layui-inline">
+                <label class="layui-form-label">创建时间:</label>
+                <div class="layui-input-inline layui-input-wrap">
+                  <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-date"></i>
+                  </div>
+                  <input type="text" name="createtime_start" id="product-create-start-date"  placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>  
+                <div class="layui-input-inline layui-input-wrap">
+                  <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-date"></i>
+                  </div>
+                  <input type="text" name="createtime_end" id="product-create-end-date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-inline">
+                <label class="layui-form-label">初审时间:</label>
+                <div class="layui-input-inline layui-input-wrap">
+                  <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-date"></i>
+                  </div>
+                  <input type="text" name="first_time_start" id="product-first-start-date"  placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>  
+                <div class="layui-input-inline layui-input-wrap">
+                  <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-date"></i>
+                  </div>
+                  <input type="text" name="first_time_end" id="product-first-end-date"  placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">二审时间:</label>
+                <div class="layui-input-inline layui-input-wrap">
+                  <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-date"></i>
+                  </div>
+                  <input type="text" name="second_time_start" id="product-second-start-date"  placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>  
+                <div class="layui-input-inline layui-input-wrap">
+                  <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-date"></i>
+                  </div>
+                  <input type="text" name="second_time_end" id="product-second-end-date"  placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+            </div> 
+
+              
+            <div class="layui-form-item">  
+
+              <div class="layui-inline">
+                <label class="layui-form-label">提交人:</label>  
+                <div class="layui-input-block">  
+                  <select name="submit_user" id="submitAuth-select" lay-search>  
+                  </select>  
+                </div>  
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">提交团队:</label>  
+                <div class="layui-input-block">  
+                  <select name="submit_team" id="submitTeam-select">  
+                  </select>  
+                </div>  
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">审核员:</label>  
+                <div class="layui-input-block">  
+                  <select name="allot_id" id="allot-select" lay-search>  
+                  </select>  
+                </div>  
+              </div>
+
+              <div class="layui-inline">  
+                <button class="layui-btn" lay-submit lay-filter="search-submit">查询</button>  
+                <button class="layui-btn layui-btn-primary" id="resetBtn">重置</button>  
+                <button class="layui-btn layui-btn-primary" id="assignAuditsBtn">分配审核员</button>  
+                <button class="layui-btn layui-btn-primary" id="batchReviewBtn">批量审核</button>  
+                <button class="layui-btn layui-btn-primary" id="exportBtn">导出</button>
+                <button class="layui-btn layui-btn-primary" id="importBtn">导入（审核结果 ）</button>
+                <button class="layui-btn" id="configColsBtn">设置列</button>
+              </div>  
+            </div>  
+          </form>
+
+          <table class="layui-hide" id="test-table-toolbar" lay-filter="test-table-toolbar"></table>
+          <div class="layui-card" id="table-pagebar"></div>
+           
+          <script type="text/html" id="test-table-toolbar-barDemo">
+            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+          </script>
+
+          <!-- <script type="text/html" id="imgTpl">
+            <img style="display: inline-block; width: 100px; " src= {{ d.image_url }}>
+          </script>   -->
+          <script type="text/html" id="imgTpl">
+            <div class="image-hover-wrapper">
+                <img class="thumbnail" style="display: inline-block; width: 60px;" src={{ d.image_url }}>
+                <div class="hover-image">
+                    <img src={{ d.image_url }}>
+                </div>
+            </div>
+        </script>
+        <script type="text/html" id="procureUlrTpl">
+          {{#  layui.each(d.purchase_url.split('|'), function(index, item){ }}
+            {{(d.purchase_url.includes("|") && index > 0)?"|":""}}
+            <a href="{{ item }}" target="_blank" style="display: inline; margin-bottom: 5px;">{{ d.purchase_url.includes("|")?(item.substr(0,30) + "..."):item }}</a>
+          {{#  }); }}
+        </script>  
+
+          <script type="text/html" id="submitUserTpl">
+            <span>{{ d.submit_user_name }}</a>
+          </script>  
+
+          <script type="text/html" id="submitTeamTpl">
+            <span>{{ d.submit_team_name }}</a>
+          </script>  
+
+          <script type="text/html" id="allotInfoTpl">
+            <span>{{ d.allot_info?.nickname || '' }}</span>
+          </script>
+
+          <script type="text/html" id="createTimeTpl">
+            <span>{{ d.createtime?layui.util.toDateString(d.createtime * 1000, 'yyyy-MM-dd HH:mm:ss'):'' }}</span>
+          </script>
+
+          <script type="text/html" id="firstTimeTpl">
+            <span>{{ d.first_time?layui.util.toDateString(d.first_time * 1000, 'yyyy-MM-dd HH:mm:ss'):'' }}</span>
+          </script>
+
+          <script type="text/html" id="secondTimeTpl">
+            <span>{{ d.second_time?layui.util.toDateString(d.second_time * 1000, 'yyyy-MM-dd HH:mm:ss'):'' }}</span>
+          </script>
+
+          <script type="text/html" id="asinTpl">
+            <div style="display:flex;align-items:center;gap:5px">
+                <span>{{ d.asin }}</span>
+                <i class="layui-icon layui-icon-link" style="cursor:pointer;color:#1E9FFF" onclick="openAmazonDetailPage({{ d.station_id }},'{{d.asin}}')"></i>
+            </div>
+          </script>
+
+          <script type="text/html" id="stateTpl">
+            <span>{{ d.state == '0' ? '待审核' : (d.state == '1' ? '初审通过' : (d.state == '2' ? '驳回' : (d.state == '3' ? '合格' : (d.state == '4' ? '待二审' : (d.state == '5' ? '异议二审' : '无效数据')))))}}</span>
+          </script>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="layui-fluid table-edit-card" id="productEditView">
+    <div class="layui-card">
+        <div class="layui-card-body" style="padding: 15px;">
+            <form class="layui-form" action="" style="margin-top:10px;margin-bottom:20px;" lay-filter="product-form">
+
+                <div class="edit-float-img">
+                  <img src="" alt="" id="edit_image"  style="width: 150px;height: 150px;">
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">站点</label>
+                    <div class="layui-input-inline" style="width:190px;">
+                      <input type="text" name="station_name" autocomplete="off" class="layui-input" id="edit_station_name" readonly>
+                    </div>
+                </div>
+                
+                <div class="layui-form-item">
+                <!-- <div class="layui-inline"> -->
+                    <label class="layui-form-label">ASIN</label>
+                    <div class="layui-input-inline">
+                    <input type="text" name="asin" autocomplete="off" class="layui-input" id="edit_asin" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">名称</label>
+                    <div class="layui-input-inline">
+                    <input type="text" name="product_name" autocomplete="off" class="layui-input" id="edit_product_name">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">品牌</label>
+                    <div class="layui-input-inline">
+                    <input type="text" name="brand" autocomplete="off" class="layui-input" id="edit_brand">
+                    </div>
+                </div>
+
+                <!-- <div class="layui-form-item">
+                    <label class="layui-form-label">类目</label>
+                    <div class="layui-input-inline">
+                    <input type="text" name="category" autocomplete="off" class="layui-input" id="edit_category">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">类目排名</label>
+                    <div class="layui-input-inline">
+                    <input type="text" name="category_rank" autocomplete="off" class="layui-input" id="edit_category_rank">
+                    </div>
+                </div> -->
+
+                <div class="layui-form-item">
+                    <div class="layui-input-inline short-width">
+                      <label class="layui-form-label">重量</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                      <input type="text" name="weight" autocomplete="off" class="layui-input" id="edit_weight">
+                    </div>
+                    <div class="layui-input-inline short-width">
+                      <label class="layui-form-label">汇率</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                      <input type="text" name="rate" autocomplete="off" class="layui-input" id="edit_rate">
+                    </div>
+                </div>
+
+
+                <div class="layui-form-item">
+                    <div class="layui-input-inline short-width">
+                      <label class="layui-form-label">进价</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                    <input type="text" name="purchase_price" autocomplete="off" class="layui-input" id="edit_purchase_price">
+                    </div>
+                    <div class="layui-input-inline short-width">
+                      <label class="layui-form-label">售价</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                    <input type="text" name="sale_price" autocomplete="off" class="layui-input" id="edit_sale_price">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-inline short-width">
+                      <label class="layui-form-label">FBA费用</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                    <input type="text" name="fba_price" autocomplete="off" class="layui-input" id="edit_fba_price">
+                    </div>
+                    <div class="layui-input-inline short-width">
+                      <label class="layui-form-label">比例</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                    <input type="text" name="ratio" autocomplete="off" class="layui-input" id="edit_ratio">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                  <div class="layui-input-inline short-width">
+                    <label class="layui-form-label">比例系数</label>
+                  </div>
+                  <div class="layui-input-inline short-width">
+                  <input type="text" name="coefficient" autocomplete="off" class="layui-input" id="edit_coefficient">
+                  </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">图片链接</label>
+                    <div class="layui-input-inline long-width">
+                    <input type="text" name="image_url" autocomplete="off" class="layui-input" id="edit_image_url">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">采购链接</label>
+                    <div class="layui-input-inline long-width">
+                    <input type="text" name="purchase_url" autocomplete="off" class="layui-input" id="edit_purchase_url">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">样品采购备注</label>
+                    <div class="layui-input-inline long-width">
+                    <textarea name="remark" placeholder="样品采购备注" class="layui-textarea short-height" id="edit_remark"></textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">提交人</label>
+                    <div class="layui-input-inline long-width">
+                    <input type="text" name="submit_user_name" autocomplete="off" class="layui-input" id="edit_submit_user_name" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">提交团队</label>
+                    <div class="layui-input-inline long-width">
+                    <input type="text" name="submit_team_name" autocomplete="off" class="layui-input" id="edit_submit_team_name" readonly>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center;">
+                  <hr class="layui-bg-gray" style="flex-grow: 1; margin-left: 10px;">
+                  <span>当前状态</span>
+                  <hr class="layui-bg-gray" style="flex-grow: 1; margin-left: 10px;">
+                </div>
+
+                <div class="layui-form-item radio-wrap">
+                    <div><input type="radio" name="state" value="0" title="待审核"></div>
+                    <div><input type="radio" name="state" value="1" title="初审通过"></div>
+                    <div><input type="radio" name="state" value="2" title="审核驳回"></div>
+                    <div><input type="radio" name="state" value="3" title="审核通过"></div>
+                    <div><input type="radio" name="state" value="4" title="待二审"></div>
+                    <div><input type="radio" name="state" value="5" title="异议二审"></div>
+                    <div><input type="radio" name="state" value="-1" title="无效数据"></div>
+                </div>
+
+                <div class="layui-form-item" id="edit_reason_item">
+                  <label class="layui-form-label">原因</label>
+                  <div class="layui-input-inline long-width">
+                    <textarea name="reason" placeholder="审核原因" class="layui-textarea short-height" id="edit_reason"></textarea>
+                  </div>
+                </div>
+
+                <div class="layui-form-item">
+                  <div class="layui-input-inline" style="text-align: center;width:100%;margin-top:20px">
+                    <button class="layui-btn" lay-submit lay-filter="product-form">保存修改</button>
+                    <button class="layui-btn layui-btn-primary" lay-filter="product-form" id="hideFormButton">取消</button>
+                  </div>
+                </div>
+                
+                
+            </form>
+        </div>
+    </div>
+</div>
+<input type="hidden" value="1" id="productListType" />
+
+<style>
+    .radio-wrap {
+      display: flex;
+      flex-wrap: wrap; /* 当内容超出容器宽度时自动换行 */
+    }
+    .radio-wrap .layui-input-block {
+      margin: 0; /* 移除默认外边距 */
+      padding: 5px; /* 可选：添加内边距以增加间距 */
+    }
+    .radio-wrap .layui-input-block div {
+      margin-bottom: 10px; /* 单选按钮之间的垂直间距 */
+    }
+    .edit-float-img{
+      position: absolute;
+      right: 30px;
+      border: 1px solid #333;
+    }
+    .layui-table-click{
+      background-color: #d0d0d0;
+    }
+    
+    .layui-table-cell{
+        max-height: 40px;
+        /* line-height: 70px; */
+    }
+
+    .table-90-width{
+       width: 67%;
+        position: fixed;
+        left: 0;
+        overflow: auto;
+        height: 85%;
+    }
+    .table-edit-card{
+        width: 30%;
+        position: fixed;
+        right: 0;
+        height: 85%;
+        overflow: auto;
+        padding-top: 0;
+        margin-top: 15px;
+        padding-left: 0px;
+    }
+    .layui-form-item{
+        margin-bottom: 3px;
+    }
+    .layui-input{
+        height: 30px;
+    }
+    .layui-form-label{
+        padding: 5px 15px 5px 0px;
+        width: 85px;
+    }
+    .layui-input-block{
+        margin-left: 100px;
+    }
+
+    .short-width{
+      width: 90px !important;
+    }
+
+    .short-height{
+      min-height: 50px !important;
+      height: 50px;
+    }
+    
+    .long-width{
+      width: 290px !important;
+    }
+    
+</style>
+
+
+<style>
+  .image-hover-wrapper {
+      position: relative;
+      display: inline-block;
+  }
+  
+  .hover-image {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      background: #fff;
+      padding: 5px;
+      border: 1px solid #ddd;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+  
+  .hover-image img {
+      max-width: 400px;
+      max-height: 400px;
+  }
+  
+  .image-hover-wrapper:hover .hover-image {
+      display: block;
+  }
+</style>
+
+<script>
+  // 添加鼠标移动事件处理
+ 
+</script>
+
+
+<script src="dist/views/product/product.js"></script>

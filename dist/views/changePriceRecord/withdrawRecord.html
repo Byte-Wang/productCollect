@@ -1,0 +1,181 @@
+<div class="layui-fluid" id="withdrawRecordContainer">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">提现记录看板</div>
+        <div class="layui-card-body">
+          <form class="layui-form layui-form-pane" lay-filter="withdraw-search-form" id="withdraw-search-form" style="margin-bottom:12px;">
+            <div class="layui-form-item">
+              <div class="layui-inline">
+                <label class="layui-form-label">店铺名称</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="withdraw-store-name" placeholder="输入店铺名称" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-inline">
+                <label class="layui-form-label">站点名称</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="withdraw-site-name" placeholder="输入站点名称" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-inline">
+                <button class="layui-btn" lay-submit lay-filter="withdraw-search-submit" id="withdraw-search-btn">查询</button>
+              </div>
+            </div>
+          </form>
+
+          <table class="layui-hide" id="withdraw-store-table" lay-filter="withdraw-store-table"></table>
+          <div id="withdraw-store-pagebar"></div>
+          
+          <script type="text/html" id="withdrawBar">
+            <a class="layui-btn layui-btn-xs" lay-event="view_withdraw">查看提现记录</a>
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['table', 'form', 'layer', 'laypage'], function(){
+  var table = layui.table;
+  var form = layui.form;
+  var layer = layui.layer;
+  var laypage = layui.laypage;
+  var $ = layui.$;
+
+  // 获取查询参数
+  function getWithdrawSearchParams(){
+    var params = {};
+    var storeName = $('#withdraw-store-name').val();
+    var siteName = $('#withdraw-site-name').val();
+    
+    if(storeName) params.store_name = storeName;
+    if(siteName) params.site_name = siteName;
+    
+    params.group_by_store_name = 1; // 固定参数：按店铺分组
+    return params;
+  }
+
+  // 渲染主表（店铺列表）
+  function renderStoreTable(page, limit){
+    var params = getWithdrawSearchParams();
+    page = page || 1;
+    limit = limit || 20;
+    
+    params.page = page;
+    params.limit = limit;
+    
+    getRequest('/index/getWithdrawRecord', params, function(res){
+      if(res.code != 1){
+        layer.msg(res.msg || '获取数据失败', {icon: 2});
+        return;
+      }
+      var dataList = res.data.list || [];
+      var total = res.data.total || 0;
+      
+      table.render({
+        elem: '#withdraw-store-table',
+        data: dataList,
+        page: false, 
+        limit: limit,
+        cols: [[
+          {field: 'store_name', title: '店铺名称', width: 250},
+          {field: 'count', title: '提现记录次数', width: 150},
+          {title: '操作', toolbar: '#withdrawBar', minWidth: 200}
+        ]]
+      });
+
+      // 渲染分页
+      laypage.render({
+        elem: 'withdraw-store-pagebar',
+        count: total,
+        curr: page,
+        limit: limit,
+        layout: ['count', 'prev', 'page', 'next', 'limit', 'skip'],
+        jump: function(obj, first){
+            if(!first){
+                renderStoreTable(obj.curr, obj.limit);
+            }
+        }
+      });
+    });
+  }
+
+  // 监听搜索
+  form.on('submit(withdraw-search-submit)', function(){
+    renderStoreTable(1, 20);
+    return false;
+  });
+
+  // 监听工具条
+  table.on('tool(withdraw-store-table)', function(obj){
+    var data = obj.data;
+    var event = obj.event;
+    
+    if(event === 'view_withdraw'){
+      toggleWithdrawalRow(obj);
+    }
+  });
+
+  // 展开/折叠 二级详情（提现记录）
+  function toggleWithdrawalRow(obj){
+    var data = obj.data;
+    var tr = obj.tr;
+    var storeName = data.store_name;
+    // 生成唯一ID
+    var rowId = 'withdraw-row-' + storeName.replace(/[^a-zA-Z0-9]/g, '');
+    
+    var detailRow = $('#'+rowId);
+    var btn = tr.find('a[lay-event="view_withdraw"]');
+
+    if(detailRow.length > 0){
+       // 已存在 -> 收起
+       detailRow.remove();
+       btn.text('查看提现记录');
+       return;
+    }
+
+    // 不存在 -> 展开
+    btn.text('收起提现记录');
+
+    var colspan = tr.find('td').length;
+    var detailHtml = '<tr id="'+rowId+'" class="detail-row"><td colspan="'+colspan+'" style="padding: 10px; background-color: #fcfcfc;"><div style="padding: 10px; border: 1px solid #eee; background: #fff;"><h4>店铺【'+storeName+'】的提现记录</h4><table id="table-'+rowId+'"></table></div></td></tr>';
+    
+    tr.after(detailHtml);
+
+    // 查询明细
+    var detailParams = {
+      store_name: storeName,
+      limit: 50 // 默认展示最近50条
+    };
+
+    getRequest('/index/getWithdrawRecord', detailParams, function(res){
+      if(res.code == 1){
+        var detailList = res.data.list || [];
+        
+        table.render({
+          elem: '#table-' + rowId,
+          data: detailList,
+          cols: [[
+            {field:'amount', title:'提现金额', width:120},
+            {field:'currency', title:'提现币种', width:100},
+            {field:'created_time', title:'提现时间', width:180},
+            {field:'operator_username', title:'操作人用户名', width:150}
+          ]],
+          page: false,
+          size: 'sm'
+        });
+      } else {
+        layer.msg('加载明细失败');
+        // 加载失败，移除行并恢复按钮
+        $('#'+rowId).remove();
+        btn.text('查看提现记录');
+      }
+    });
+  }
+
+  // 初始化加载主表
+  renderStoreTable(1, 20);
+});
+</script>

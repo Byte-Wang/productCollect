@@ -1,0 +1,144 @@
+
+<div class="layui-row" style="position: fixed; z-index: 100;width:100%;">
+    <!-- <ul class="layui-nav " lay-filter="component-nav">
+        <li class="layui-nav-item layui-this"><a  lay-href="">首页</a></li>
+        <li class="layui-nav-item"><a lay-href="plugProduct/records">选品大厅</a></li>
+        <li class="layui-nav-item"><a lay-href="product/personList">个人产品管理</a></li>
+        <li class="layui-nav-item"><a lay-href="product/teamList">团队产品管理</a></li>
+        <li class="layui-nav-item"><a lay-href="team/team">团队管理</a></li>
+        <li class="layui-nav-item"><a lay-href="teamArea/teamArea">大区管理</a></li>
+        <li class="layui-nav-item"><a lay-href="user/user">用户管理</a></li>
+        <li class="layui-nav-item"><a lay-href="user/role">角色管理</a></li>
+        <li class="layui-nav-item"><a lay-href="station/station">站点配置</a></li>
+    </ul> -->
+    <ul class="layui-nav " lay-filter="component-nav" id="mainMenu">
+      <!-- 菜单将通过 JavaScript 动态渲染 -->
+    </ul>
+    <ul class="layui-nav layui-layout-right" style="right: 20px" lay-filter="layadmin-layout-right">
+      
+        <li class="layui-nav-item layui-hide-xs" lay-unselect>
+            <a href="javascript:;" layadmin-event="fullscreen">
+              <i class="layui-icon layui-icon-screen-full"></i>
+            </a>
+        </li>
+
+        <!-- <li class="layui-nav-item" lay-unselect>
+          <a lay-href="app/message/" layadmin-event="message">
+            <i class="layui-icon layui-icon-notice"></i>
+            
+          
+            <script type="text/html" template lay-url="./json/message/new.js">
+            {{# if(d.data.newmsg){ }} 
+              <span class="layui-badge-dot"></span>
+            {{# } }}
+            </script>
+          </a>
+        </li> -->
+        
+        <li class="layui-nav-item" lay-unselect>
+          <!-- <script type="text/html" template lay-url="./json/user/session.js" 
+          lay-done="layui.element.render('nav', 'layadmin-layout-right');"> -->
+            <a href="javascript:;">
+              <cite id="currentUserName">{{ d.nickname }}</cite>
+            </a>
+            <dl class="layui-nav-child">
+              <dd><a lay-href="set/user/info">基本资料</a></dd>
+              <dd><a lay-href="set/user/password">修改密码</a></dd>
+              <hr>
+              <dd layadmin-event="logout" style="text-align: center;"><a>退出</a></dd>
+            </dl>
+          <!-- </script> -->
+        </li>
+        
+      </ul>
+</div> 
+
+
+<div class="layui-row" id="LAY_app_body" style="padding-top:60px;">
+    <div class="layadmin-tabsbody-item layui-show"></div>
+</div>
+
+
+<div class="layadmin-body-shade" layadmin-event="shade"></div>
+
+<script>
+layui.use(['element'], function() {
+    var element = layui.element;
+    var hash = window.location.hash;
+    var $ = layui.$;
+
+    // 定义菜单配置
+    var menus = [
+        {href: '', title: '首页', auth: true},  // 首页所有人可见
+        {href: 'plugProduct/records', title: '选品大厅', auth: true},
+        {href: 'product/personList', title: '个人产品管理', auth: 'product'},
+        {href: 'product/teamList', title: '团队产品管理', auth: 'groupProduct'},
+        {href: 'team/team', title: '团队管理', auth: 'team'},
+        {href: 'teamArea/teamArea', title: '大区管理', auth: 'teamArea'},
+        {href: 'user/user', title: '用户管理', auth: 'auth/admin'},
+        {href: 'user/role', title: '角色管理', auth: 'auth/group/add'},
+        {href: 'station/station', title: '站点配置', auth: 'station'},
+        {href: 'otp/otp', title: 'otp工具', auth: 'otp'},
+        {href: 'temuCollection/temuCollection', title: 'Temu采集数据', auth: 'teamArea'},
+        {href: 'changePriceRecord/changePriceRecord', title: '改价记录', auth: 'teamArea'},
+        {href: 'changePriceRecord/stockChangeRecord', title: '库存记录', auth: 'teamArea'},
+        {href: 'changePriceRecord/recordDashboard', title: '店铺看板', auth: 'teamArea'},
+        {href: 'changePriceRecord/withdrawRecord', title: '提现记录', auth: 'teamArea'},
+    ];
+
+    // 获取用户权限
+    var menuPathList = layui.data('layuiAdmin').menuPathList;
+    console.log('准备加载菜单', menuPathList);
+    if (!menuPathList) {
+        menuPathList = [];
+    }
+
+    // 检查权限的函数
+    function checkPermission(path) {
+        var menu = menus.find(function(item) {
+            return item.href === path;
+        });
+        if (!menu) {
+            return false;
+        }
+        return menu.auth === true || (Array.isArray(menuPathList) && menuPathList.includes(menu.auth));
+    }
+
+    // 验证当前路径权限
+    function verifyCurrentPath() {
+        var currentPath = window.location.hash.replace('#/', '');
+        if (!checkPermission(currentPath)) {
+            // 无权限访问，重定向到首页或显示错误页面
+            window.location.href = '';
+            console.warn('无权限访问该页面');
+        }
+    }
+
+    // 渲染菜单
+    var menuHtml = '';
+    menus.forEach(function(menu) {
+        if (menu.auth === true || (Array.isArray(menuPathList) && menuPathList.includes(menu.auth))) {
+            var activeClass = (hash.replace('#/', '') === menu.href) ? 'layui-this' : '';
+            menuHtml += `<li class="layui-nav-item ${activeClass}"><a lay-href="${menu.href}">${menu.title}</a></li>`;
+        }
+    });
+    
+    $('#mainMenu').html(menuHtml);
+    element.render('nav');
+
+    // 监听 hash 变化
+    $(window).on('hashchange', function() {
+        var newHash = window.location.hash.replace('#/', '');
+        $('.layui-nav-item').removeClass('layui-this');
+        $('.layui-nav-item a[lay-href="'+newHash+'"]').parent().addClass('layui-this');
+        // 验证当前路径权限
+        verifyCurrentPath();
+    });
+    verifyCurrentPath();
+});
+
+var userInfo = layui.data('layuiAdmin').userInfo;
+layui.$("#currentUserName").html(userInfo.nickname?userInfo.nickname:"unkonw");
+
+</script>
+

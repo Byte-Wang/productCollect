@@ -1,0 +1,468 @@
+<div class="layui-fluid" id="userTable">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-body">
+            <form class="layui-form" action="" lay-filter="component-form-group">
+                <div class="layui-form-item"> 
+                    <div class="layui-inline"> 
+                        <button type="button" class="layui-btn" id="addUserBtn">新增</button>  
+                    </div>  
+                </div>  
+            </form>
+  
+            <table class="layui-hide" id="user-table" lay-filter="user-table"></table>
+            <div class="layui-card" id="user-pagebar"></div>
+
+            <script type="text/html" id="operationTpl">
+              <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+              <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+            </script>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- 添加用户弹窗表单模板 -->
+<script type="text/html" id="userFormTpl">
+  <form class="layui-form" id="userForm" lay-filter="userForm" style="padding: 20px;">
+    <div class="layui-form-item">
+      <label class="layui-form-label">用户名</label>
+      <div class="layui-input-block">
+        <input type="text" name="username" required lay-verify="required" placeholder="请输入用户名" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">昵称</label>
+      <div class="layui-input-block">
+        <input type="text" name="nickname" required lay-verify="required" placeholder="请输入昵称" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">角色</label>
+      <div class="layui-input-block">
+        <select name="group_arr" lay-verify="required" lay-filter="group_arr" multiple>
+          <!-- 选项将通过 JavaScript 动态添加 -->
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item" id="teamAreaFormItem" style="display: none;">
+      <label class="layui-form-label">所属大区</label>
+      <div class="layui-input-block">
+        <select name="team_area_id">
+          <option value="">请选择所属大区</option>
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">所属团队</label>
+      <div class="layui-input-block">
+        <select name="team_id">
+          <option value="">请选择团队</option>
+          <!-- 选项将通过 JavaScript 动态添加 -->
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">密码</label>
+      <div class="layui-input-block">
+        <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">备注</label>
+      <div class="layui-input-block">
+        <textarea name="motto" placeholder="请输入备注" class="layui-textarea"></textarea>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">状态</label>
+      <div class="layui-input-block">
+        <input type="radio" name="status" value="1" title="启用" checked>
+        <input type="radio" name="status" value="0" title="禁用">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="userFormSubmit">保存</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+      </div>
+    </div>
+  </form>
+</script>
+
+
+<script>
+let currentPageSize = 10;
+
+layui.use(['admin', 'table', 'form', 'laydate'], function(){
+  var admin = layui.admin
+  ,setter = layui.setter
+  ,table = layui.table
+  ,element = layui.element
+  ,layer = layui.layer
+  ,laydate = layui.laydate
+  ,form = layui.form
+  $ = layui.$;
+
+  console.log("user.html load");
+  var userInfo = layui.data('layuiAdmin').userInfo;
+
+  // 新增按钮点击事件
+  $('#addUserBtn').on('click', function(){
+    layer.open({
+      type: 1,
+      title: '新增用户',
+      area: ['500px', '680px'],
+      content: $('#userFormTpl').html(),
+      success: function(){
+        // 初始化表单
+        form.render();
+        
+        // 初始化角色下拉框
+        getRequest("/auth.group/index", {
+          isTree: true,
+          page: 1,
+          initKey: 'id',
+          initValue: '',
+          select: true,
+          quick_search: ''
+        }, function(res){
+          if(res.code == 1){
+            let selectEl = $('[name="group_arr"]');
+            res.data.options.forEach(item => {
+              if (userInfo.group_arr.includes(5) && (item.id == 1 || item.id == 5)) {
+                return;
+              }
+              selectEl.append(`<option value="${item.id}">${item.name}</option>`);
+            });
+            form.render('select');
+          }
+        });
+
+        // 初始化团队下拉框
+        getRequest("/team/select", {
+          isTree: true,
+          page: 1,
+          initKey: 'id',
+          initValue: '',
+          select: true,
+          quick_search: ''
+        }, function(res){
+          if(res.code == 1){
+            let selectEl = $('[name="team_id"]');
+            res.data.list.forEach(item => {
+              selectEl.append(`<option value="${item.id}">${item.name}</option>`);
+            });
+            form.render('select');
+          }
+        });
+
+        // 初始化大区下拉框
+        getRequest("/index/getTeamArea", {
+          page: 1,
+          limit: 10,
+        }, (res) => {
+          if(res.code == 1){
+            let selectEl = $('[name="team_area_id"]');
+            res.data.list.forEach(item => {
+              selectEl.append(`<option value="${item.id}">${item.name}</option>`);
+            });
+            form.render('select');
+          }
+        });
+
+        // 监听角色选择变化
+        form.on('select(group_arr)', function(data){
+          let selectedValues = data.value.split(',');
+          if(selectedValues.includes('5')){
+            $('#teamAreaFormItem').show();
+          } else {
+            $('#teamAreaFormItem').hide();
+            $('[name="team_area_id"]').val('');
+          }
+          form.render('select');
+        });
+      }
+    });
+  });
+
+  // 表单提交事件
+  form.on('submit(userFormSubmit)', function(data){
+    let field = data.field;
+    // 处理角色数组
+    field.group_arr = field.group_arr.split(',');
+    
+    postRequest("/auth.admin/add", field, function(res){
+      if(res.code == 1){
+        layer.msg(res.msg, {icon: 1});
+        layer.closeAll('page');
+        // 刷新表格
+        renderUserTable({page: 1, limit: currentPageSize});
+      } else {
+        layer.msg(res.msg || '添加失败', {icon: 2});
+      }
+    });
+    return false;
+  });
+
+    function renderUserTable(params){
+        var setter = layui.setter
+        var table = layui.table
+        var laypage = layui.laypage;
+        var form = layui.form;
+
+        currentPageSize = params.limit;
+
+        getRequest("/auth.admin/index",params,(res) => {
+            if (res.code != 1) {
+                if (res.code == 302) {
+                    window.location.href = "/#/user/login"
+                }
+                layer.msg(res.msg || '数据获取失败', {
+                    offset: '15px'
+                    ,icon: 2
+                    ,time: 1000
+                }, function(){ });
+                return;
+            }      
+            console.log("取到列表：",res);
+
+            var cloudData = res.data;
+
+            table.render({
+                elem: '#user-table'
+                ,data: cloudData.list
+                ,title: '用户数据'
+                ,cellMinWidth: 60
+                ,cellMinHeight: 100
+                ,page: false
+                ,limit: 10
+                ,cols: [[
+                    {type: 'checkbox'},
+                    {field:'id', title:'ID', width:90},
+                    {field:'username', title:'用户名', width:120},
+                    {field:'nickname', title:'昵称', width:120},
+                    {field:'group_name_arr', title:'角色', width:120, templet: function(d){
+                        return d.group_name_arr.join(', ');
+                    }},
+                    {field:'team_name', title:'所属团队', width:350, templet: function(d){
+                      let teamAreaInfo = "";
+                      if (d.team_area_info) {
+                        teamAreaInfo = "负责【" + d.team_area_info.name + "】区";
+                      } else if (d.team && d.team.team_area_name) {
+                        teamAreaInfo = "【" + d.team.team_area_name + "】区";
+                      }
+
+                      let teamInfo = ''
+                      if (d.manage_team) {
+                        if (teamAreaInfo != "") {
+                          teamAreaInfo += " - ";
+                        }
+                        teamInfo = "负责【" + d.manage_team.name + "】团队";
+                      } else if (d.team && d.team.name) {
+                        if (teamAreaInfo != "") {
+                          teamAreaInfo += " - ";
+                        }
+                        teamInfo = "【"+d.team.name+"】团队";
+                      } 
+
+                      if (teamAreaInfo == "" && teamInfo == ""){
+                        teamInfo = '<span style="color: #cdcbcb;">无归属</span>'
+                      }
+                      
+                      return teamAreaInfo + teamInfo;
+                    }},
+                    // {field:'team_area_name', title:'所属大区', width:150, templet: function(d){
+                    //     if (d.team_area_info) {
+                    //       return d.team_area_info.name;
+                    //     } else if (d.team && d.team.team_area_name) {
+                    //       return d.team.team_area_name;
+                    //     }
+                    //     return '<span style="color: #cdcbcb;">无归属</span>';
+                    // }},
+                    {field:'lastlogintime', title:'最后登录', width:180, templet: function(d){
+                        return d.lastlogintime;
+                    }},
+                    {field:'createtime', title:'创建时间', width:180, templet: function(d){
+                        return layui.util.toDateString(d.createtime * 1000, 'yyyy-MM-dd HH:mm:ss');
+                    }},
+                    {field:'status', title:'状态', width:90, templet: function(d){
+                        if (d.status == 1) {
+                            return '<span class="layui-badge layui-bg-green">启用</span>';
+                        } else if (d.status == 0) {
+                            return '<span class="layui-badge layui-bg-red">禁用</span>';
+                        }
+                    }},
+                    {title:'操作', width:150, templet:'#operationTpl', fixed:'right'}
+                ]],
+                done: function (res, curr, count) {
+                    console.log(res,curr,count);
+                }
+            });
+
+            laypage.render({
+                elem: "user-pagebar",
+                count: cloudData.total,
+                curr: params.page,
+                limit: params.limit,
+                layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip'], // 功能布局
+                jump: function(obj){
+                    console.log('当前在第'+ params.page + '页，目标是第'+obj.curr+'页')
+                    if (params.page == obj.curr && params.limit == obj.limit) {
+                    console.log('不加载')
+                    return;
+                    }
+                    console.log('开始加载')
+                    params.page = obj.curr;
+                    params.limit = obj.limit;
+                    renderUserTable(params);
+                }
+            });
+
+            table.on('tool(user-table)', function(obj){
+                var data = obj.data;
+                if(obj.event === 'edit'){
+                    layer.open({
+                        type: 1,
+                        title: '编辑用户',
+                        area: ['500px', '680px'],
+                        content: $('#userFormTpl').html(),
+                        success: function(){
+                            // 初始化表单
+                            form.render();
+                            
+                            // 初始化角色下拉框
+                            getRequest("/auth.group/index", {
+                                isTree: true,
+                                page: 1,
+                                initKey: 'id',
+                                initValue: '',
+                                select: true,
+                                quick_search: ''
+                            }, function(res){
+                                if(res.code == 1){
+                                    let selectEl = $('[name="group_arr"]');
+                                    res.data.options.forEach(item => {
+                                        selectEl.append(`<option value="${item.id}">${item.name}</option>`);
+                                    });
+                                    // 设置选中值
+                                    selectEl.val(data.group_arr);
+                                    form.render('select');
+                                }
+                            });
+
+                            // 初始化团队下拉框
+                            getRequest("/team/select", {
+                                isTree: true,
+                                page: 1,
+                                initKey: 'id',
+                                initValue: '',
+                                select: true,
+                                quick_search: ''
+                            }, function(res){
+                                if(res.code == 1){
+                                    let selectEl = $('[name="team_id"]');
+                                    res.data.list.forEach(item => {
+                                        selectEl.append(`<option value="${item.id}">${item.name}</option>`);
+                                    });
+                                    // 设置选中值
+                                    selectEl.val(data.team_id);
+                                    form.render('select');
+                                }
+                            });
+
+
+                            // 初始化大区下拉框
+                            getRequest("/index/getTeamArea", {
+                              page: 1,
+                              limit: 10,
+                            }, (res) => {
+                              if(res.code == 1){
+                                let selectEl = $('[name="team_area_id"]');
+                                res.data.list.forEach(item => {
+                                  selectEl.append(`<option value="${item.id}">${item.name}</option>`);
+                                });
+                                selectEl.val(data.team_area_id);
+                                form.render('select');
+                              }
+                            });
+
+                            // 监听角色选择变化
+                            form.on('select(group_arr)', function(data){
+                              let selectedValues = data.value.split(',');
+                              if(selectedValues.includes('5')){
+                                $('#teamAreaFormItem').show();
+                              } else {
+                                $('#teamAreaFormItem').hide();
+                                $('[name="team_area_id"]').val('');
+                              }
+                              form.render('select');
+                            });
+
+                            if (data.group_arr.includes(1)) {
+                              console.log('显示大区选择');
+                              $('#teamAreaFormItem').show();
+                            } else {
+                              $('#teamAreaFormItem').hide();
+                            }
+
+                            // 填充表单数据
+                            form.val('userForm', {
+                                id: data.id,
+                                username: data.username,
+                                nickname: data.nickname,
+                                motto: data.motto,
+                                status: data.status.toString()
+                            });
+
+                            // 修改表单提交事件
+                            form.on('submit(userFormSubmit)', function(formData){
+                                let field = formData.field;
+                                field.id = data.id; // 添加ID字段
+                                field.group_arr = field.group_arr.split(',');
+                                
+                                postRequest("/auth.admin/edit", field, function(res){
+                                    if(res.code == 1){
+                                        layer.msg(res.msg, {icon: 1});
+                                        layer.closeAll('page');
+                                        // 刷新表格
+                                        renderUserTable({page: 1, limit: currentPageSize});
+                                    } else {
+                                        layer.msg(res.msg || '更新失败', {icon: 2});
+                                    }
+                                });
+                                return false;
+                            });
+                        }
+                    });
+                } else if(obj.event === 'del'){
+                    layer.confirm('确定要删除该用户吗？', {
+                        btn: ['确定','取消']
+                    }, function(){
+                        // 发送删除请求
+                        delRequest("/auth.admin/del", {
+                            ids: [data.id]
+                        }, function(res){
+                            if(res.code == 1){
+                                layer.msg(res.msg, {icon: 1});
+                                // 刷新表格
+                                renderUserTable({page: 1, limit: currentPageSize});
+                            } else {
+                                layer.msg(res.msg || '删除失败', {icon: 2});
+                            }
+                        });
+                    });
+                }
+            });
+
+        });
+    }
+
+    renderUserTable({page: 1, limit: 10});
+
+});
+
+</script>

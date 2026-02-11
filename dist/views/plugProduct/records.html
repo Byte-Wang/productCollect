@@ -1,0 +1,1255 @@
+<div class="layui-fluid" id="plugProductTable">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-body">
+            <form class="layui-form" action="" lay-filter="component-form-group">
+              <div class="layui-form-item">  
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">ASIN:</label>  
+                  <div class="layui-input-block">  
+                    <input type="text" name="asin" id="search-asin" placeholder="请输入ASIN" autocomplete="off" class="layui-input">  
+                  </div>  
+                </div>
+
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">收藏状态:</label>  
+                  <div class="layui-input-block">  
+                    <select name="favoriteStatus" id="status-select">  
+                      <option value=0>全部</option>
+                      <option value=1>已被收藏</option>
+                      <option value=2>被本人收藏</option>
+                      <option value=3>未收藏</option>
+                    </select>  
+                  </div>  
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">站点:</label>  
+                  <div class="layui-input-block">  
+                    <select name="station" id="station-select" >  
+                    </select>  
+                  </div>  
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">排名:</label>  
+                  <div class="layui-input-block"> 
+                    <input style="width:200px" type="text" name="category_rank" id="search-category_rank" placeholder="输入区间,减号隔开,如:0-9999" autocomplete="off" class="layui-input"> 
+                  </div>  
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">重量:</label>  
+                  <div class="layui-input-block">
+                    <input style="width:200px" type="text" name="search-weight" id="search-weight" placeholder="输入区间,减号隔开,如:0-9999" autocomplete="off" class="layui-input"> 
+                  </div>  
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">配送方式:</label>  
+                  <div class="layui-input-block">  
+                    <select name="shipping-select" id="shipping-select" >  
+                      <option value="">全部</option>
+                      <option value="FBA">FBA</option>
+                      <option value="FBM">FBM</option>
+                      <option value="AMZ">AMZ</option>
+                    </select>  
+                  </div>  
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">品牌注册:</label>  
+                  <div class="layui-input-block">  
+                    <select name="brand-select" id="brand-select" >  
+                      <option value="">全部</option>
+                      <option value="未知">未知</option>
+                      <option value="未注册">未注册</option>
+                      <option value="已注册">已注册</option>
+                    </select>  
+                  </div>  
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">价格:</label>  
+                  <div class="layui-input-block">  
+                    <input style="width:200px" type="text" name="search-price" id="search-price" placeholder="输入区间,减号隔开,如:0-9999" autocomplete="off" class="layui-input"> 
+                  
+                  </div>  
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">利润率:</label>  
+                  <div class="layui-input-block">  
+                    <input style="width:200px" type="text" name="search-profit_margin" id="search-profit_margin" placeholder="输入区间,减号隔开,如:0-9999" autocomplete="off" class="layui-input"> 
+                  
+                  </div>  
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">评分:</label>  
+                  <div class="layui-input-block">  
+                    <input style="width:200px" type="text" name="search-preview" id="search-preview" placeholder="输入区间,减号隔开,如:0-9999" autocomplete="off" class="layui-input"> 
+                  
+                  </div>  
+                </div>
+
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">卖家数:</label>  
+                  <div class="layui-input-block">  
+                    <input style="width:200px" type="text" name="search-seller_count" id="search-seller_count" placeholder="输入区间,减号隔开,如:0-9999" autocomplete="off" class="layui-input"> 
+                  
+                  </div>  
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">评论状态:</label>  
+                  <div class="layui-input-block">  
+                    <select name="review_status" id="review_status-select" >  
+                      <option value="">全部</option>
+                      <option value="有评论">有评论</option>
+                      <option value="无评论">无评论</option>
+                      <option value="无评论有评分">无评论有评分</option>
+                    </select>  
+                  </div>  
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">提交人:</label>  
+                  <div class="layui-input-block">  
+                    <select name="submit_user" id="submitAuth-select" >  
+                    </select>  
+                  </div>  
+                </div>
+  
+                <div class="layui-inline">
+                  <label class="layui-form-label">提交团队:</label>  
+                  <div class="layui-input-block">  
+                    <select name="submit_team" id="submitTeam-select">  
+                    </select>  
+                  </div>  
+                </div>
+
+                <div class="layui-inline">  
+                  <button class="layui-btn" id="searchBtn">查询</button>  
+                  <button class="layui-btn layui-btn-primary" id="exportBtn">导出</button>  
+                </div>  
+
+              </div> 
+                
+            </form>
+  
+            <table class="layui-hide" id="plug-product-table" lay-filter="plug-product-table"></table>
+            <div class="layui-card" id="plug-product-pagebar"></div>
+
+            <script type="text/html" id="createInfoTpl">
+                <span>{{ d.create_admin_nickname }}</span>
+                <br/>
+                <span>{{ layui.util.toDateString(d.create_time * 1000, 'yyyy-MM-dd HH:mm:ss') }}</span>
+            </script>  
+
+            <script type="text/html" id="updateInfoTpl">
+                <span>{{ d.update_admin_nickname }}</span>
+                <br/>
+                <span>{{ layui.util.toDateString(d.update_time * 1000, 'yyyy-MM-dd HH:mm:ss') }}</span>
+            </script>  
+
+            <script type="text/html" id="wipoBrandRegisterInfoTpl">
+                {{# if(d.wipo_brand_registration_status == -1){ }}
+                    <span style="color: #999;">未知</span>
+                {{# }else if(d.wipo_brand_registration_status == 0){ }}
+                    <span style="color: #004706;">未注册</span>
+                {{# }else{ }}
+                    <span style="color: #840101;">已注册({{d.wipo_brand_registration_status}})</span>
+                {{# } }}
+            </script>
+            
+            <script type="text/html" id="trademarkBrandRegisterInfoTpl">
+                {{# if(d.trademark_office_brand_registration_status == -1){ }}
+                    <span style="color: #999;">未知</span>
+                {{# }else if(d.trademark_office_brand_registration_status == 0){ }}
+                    <span style="color: #004706;">未注册</span>
+                {{# }else{ }}
+                    <span style="color: #840101;">已注册({{d.trademark_office_brand_registration_status}})</span>
+                {{# } }}
+            </script>
+
+            <script type="text/html" id="imgTpl">
+                <div class="image-hover-wrapper">
+                    <img class="thumbnail" style="display: inline-block; width: 60px;" src={{ d.picture_url }}>
+                    <div class="hover-image">
+                        <img src={{ d.picture_url }}>
+                    </div>
+                </div>
+            </script>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layui-fluid table-edit-card" id="productEditView">
+    <div class="layui-card">
+        <div class="layui-card-body" style="padding: 15px;">
+            <form class="layui-form" action="" style="margin-top:10px;margin-bottom:20px;" lay-filter="product-form">
+                <div class="edit-float-img">
+                    <img src="" alt="" id="edit_image" style="width: 150px;height: 150px;">
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">站点</label>
+                    <div class="layui-input-inline" style="width:190px;">
+                        <input type="text" name="station_title" autocomplete="off" class="layui-input" id="edit_station_title" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">ASIN</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="asin" autocomplete="off" class="layui-input" id="edit_asin" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">卖家</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="seller" autocomplete="off" class="layui-input" id="edit_seller" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">卖家数量</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="seller_count" autocomplete="off" class="layui-input" id="edit_seller_count" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">配送方式</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="shipping_method" autocomplete="off" class="layui-input" id="edit_shipping_method" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                  <label class="layui-form-label">商品标题</label>
+                  <div class="layui-input-inline" style="width: 355px;">
+                      <!-- <input type="text" style="width:325px;" name="product_name" autocomplete="off" class="layui-input" id="edit_product_name" readonly> -->
+                      <textarea name="product_name" class="layui-textarea" id="edit_product_name" style="min-height: 60px; padding-right: 30px;" readonly></textarea>
+                      <i class="layui-icon layui-icon-link" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" id="openDetailBtn"></i>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">类目</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="category" autocomplete="off" class="layui-input" id="edit_category" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-inline short-width">
+                        <label class="layui-form-label">排名</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                        <input type="text" name="rank" autocomplete="off" class="layui-input" id="edit_rank" readonly>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                        <label class="layui-form-label">评分</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                        <input type="text" name="rating" autocomplete="off" class="layui-input" id="edit_rating" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">品牌名</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="brand_name" autocomplete="off" class="layui-input" id="edit_brand_name" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-inline short-width">
+                        <label class="layui-form-label">FBA费用</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                        <input type="text" name="fba_fee" autocomplete="off" class="layui-input" id="edit_fba_fee" readonly>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                        <label class="layui-form-label">售价</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                        <input type="text" name="price" autocomplete="off" class="layui-input" id="edit_price" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-inline short-width">
+                        <label class="layui-form-label">重量</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                        <input type="text" name="weight" autocomplete="off" class="layui-input" id="edit_weight" readonly>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                        <label class="layui-form-label">利润率</label>
+                    </div>
+                    <div class="layui-input-inline short-width">
+                        <input type="text" name="profit_margin" autocomplete="off" class="layui-input" id="edit_profit_margin" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">尺寸</label>
+                    <div class="layui-input-inline long-width">
+                        <input type="text" name="dimensions" autocomplete="off" class="layui-input" id="edit_dimensions" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">图片链接</label>
+                    <div class="layui-input-inline long-width">
+                        <input type="text" name="picture_url" autocomplete="off" class="layui-input" id="edit_picture_url" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">上架日期</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="listing_date" autocomplete="off" class="layui-input" id="edit_listing_date" readonly>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-inline" style="text-align: center;width:100%;margin-top:20px">
+                        <button class="layui-btn" lay-filter="product-form" id="importProductBtn">导入产品库</button>
+                        <button class="layui-btn layui-btn-primary" lay-filter="product-form" id="hideFormButton">取消</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+  </div>
+
+
+  <div class="layui-fluid table-edit-card" id="productAddView" hidden>
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form" action="" style="margin-top:0px;margin-bottom:20px;" lay-filter="product-add-form">
+                
+  
+              <div class="layui-form-item">
+                  <label class="layui-form-label">ASIN</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="asin" autocomplete="off" class="layui-input" id="add_asin">
+                  </div>
+                  <div class="layui-input-inline" style="width: auto;">
+                      <button type="button" class="layui-btn layui-btn-sm" id="checkAsinBtn">检查</button>
+                  </div>
+              </div>
+              
+  
+              <div class="layui-form-item">
+                  <div class="layui-input-inline short-width">
+                    <label class="layui-form-label">站点</label>
+                  </div>
+                  <div class="layui-input-inline medium-width">
+                    <select name="station_id" lay-verify="required" lay-filter="stationSelect">
+                      <option value="">请选择站点</option>
+                    </select>
+                  </div>
+                  <div class="layui-input-inline short-width">
+                    <label class="layui-form-label">汇率</label>
+                  </div>
+                  <div class="layui-input-inline medium-width">
+                    <input type="text" name="rate" autocomplete="off" class="layui-input" id="add_rate" readonly>
+                  </div>
+              </div>
+                
+                
+  
+              <div class="layui-form-item">
+                <div class="layui-input-inline short-width">
+                  <label class="layui-form-label" style="color:#f00;font-weight: 500;">产品名称</label>
+                </div>
+                <div class="layui-input-inline medium-width">
+                  <input type="text" name="product_name" lay-verify="required|productName" autocomplete="off" class="layui-input" id="add_product_name">
+                </div>
+                <div class="layui-input-inline short-width">
+                  <label class="layui-form-label">品牌</label>
+                </div>
+                <div class="layui-input-inline medium-width">
+                  <input type="text" name="brand" lay-verify="required" autocomplete="off" class="layui-input" id="add_brand">
+                </div>
+              </div>
+  
+                <!-- <div class="layui-form-item">
+                  <div class="layui-input-inline short-width">
+                    <label class="layui-form-label">类目</label>
+                  </div>
+                  <div class="layui-input-inline medium-width">
+                    
+                    <input type="text" name="category" autocomplete="off" class="layui-input" id="add_category">
+                  </div>
+                  <div class="layui-input-inline short-width">
+                    <label class="layui-form-label">类目排名</label>
+                  </div>
+                  <div class="layui-input-inline medium-width">
+                    <input type="text" name="category_rank" autocomplete="off" class="layui-input" id="add_category_rank">
+                  </div>
+              </div> -->
+  
+  
+                <div class="layui-form-item">
+                    <div class="layui-input-inline short-width">
+                      <label class="layui-form-label" style="color:#f00;font-weight: 500;">重量</label>
+                    </div>
+                    <div class="layui-input-inline medium-width">
+                      <input type="text" name="weight" autocomplete="off" lay-verify="required" class="layui-input" id="add_weight">
+                    </div>
+                    <div class="layui-input-inline short-width">
+                      <label class="layui-form-label">FBA费用</label>
+                    </div>
+                    <div class="layui-input-inline medium-width">
+                      <input type="text" name="fba_price" autocomplete="off" lay-verify="required" class="layui-input" id="add_fba_price">
+                    </div>
+                </div>
+  
+  
+                <div class="layui-form-item">
+                    <div class="layui-input-inline short-width">
+                      <label class="layui-form-label" style="color:#f00;font-weight: 500;">进价</label>
+                    </div>
+                    <div class="layui-input-inline medium-width">
+                    <input type="text" name="purchase_price" autocomplete="off" lay-verify="required" class="layui-input" id="add_purchase_price">
+                    </div>
+                    <div class="layui-input-inline short-width">
+                      <label class="layui-form-label">售价</label>
+                    </div>
+                    <div class="layui-input-inline medium-width">
+                    <input type="text" name="sale_price" autocomplete="off" lay-verify="required" class="layui-input" id="add_sale_price">
+                    </div>
+                </div>
+  
+                <div class="layui-form-item">
+                  <div class="layui-input-inline short-width">
+                    <label class="layui-form-label">比例</label>
+                  </div>
+                  <div class="layui-input-inline medium-width">
+                  <input type="text" name="ratio" autocomplete="off" lay-verify="required" class="layui-input" id="add_ratio" readonly>
+                  </div>
+                  <div class="layui-input-inline short-width">
+                    <label class="layui-form-label">比例系数</label>
+                  </div>
+                  <div class="layui-input-inline medium-width">
+                  <input type="text" name="coefficient" autocomplete="off" lay-verify="required" class="layui-input" id="add_coefficient" readonly>
+                  </div>
+                   
+                </div>
+  
+                <div class="layui-form-item">
+                    <label class="layui-form-label">图片链接</label>
+                    <div class="layui-input-inline long-width">
+                    <input type="text" name="image_url" autocomplete="off" class="layui-input" id="add_image_url">
+                    </div>
+                </div>
+  
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="color:#f00;font-weight: 500;">采购链接</label>
+                    <div class="layui-input-inline long-width">
+                    <input type="text" name="purchase_url" autocomplete="off" lay-verify="required" class="layui-input" id="add_purchase_url">
+                    </div>
+                </div>
+  
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="color:#f00;font-weight: 500;">样品采购备注</label>
+                    <div class="layui-input-inline long-width">
+                    <textarea name="remark" placeholder="样品采购备注" class="layui-textarea short-height" id="add_remark"></textarea>
+                    </div>
+                </div>
+  
+                <div class="layui-form-item">
+                    <label class="layui-form-label">提交人</label>
+                    <div class="layui-input-inline long-width">
+                    <input type="text" name="submit_user_name" autocomplete="off" class="layui-input" id="add_submit_user_name" readonly>
+                    </div>
+                </div>
+  
+                <div class="layui-form-item">
+                    <label class="layui-form-label">提交团队</label>
+                    <div class="layui-input-inline long-width">
+                    <input type="text" name="submit_team_name" autocomplete="off" class="layui-input" id="add_submit_team_name" readonly>
+                    </div>
+                </div>
+  
+                <div class="layui-form-item">
+                  <div class="layui-input-inline" style="text-align: center;width:100%;margin-top:20px">
+                    <button type="button" class="layui-btn" lay-submit lay-filter="product-add-form">保存</button>
+                  </div>
+                </div>
+                
+                
+            </form>
+        </div>
+    </div>
+  </div>
+  
+  <style>
+      .radio-wrap {
+        display: flex;
+        flex-wrap: wrap; /* 当内容超出容器宽度时自动换行 */
+      }
+      .radio-wrap .layui-input-block {
+        margin: 0; /* 移除默认外边距 */
+        padding: 5px; /* 可选：添加内边距以增加间距 */
+      }
+      .radio-wrap .layui-input-block div {
+        margin-bottom: 10px; /* 单选按钮之间的垂直间距 */
+      }
+      .edit-float-img{
+        position: absolute;
+        right: 30px;
+        border: 1px solid #333;
+      }
+      .layui-table-click{
+        background-color: #d0d0d0;
+      }
+      
+      .layui-table-cell{
+          max-height: 60px;
+          height: 60px;
+          padding: 5px 10px;
+          /* line-height: 70px; */
+      }
+
+      .layui-table-cell:has(img) {
+          padding: 0;
+      }
+
+      td[data-field="picture_url"] .layui-table-cell {
+          padding: 0;
+      }
+
+      .layui-table-grid-down {
+          display: none !important;
+      }
+  
+      .table-90-width{
+         width: 67%;
+          position: fixed;
+          left: 0;
+          overflow: auto;
+          height: 85%;
+      }
+      .table-edit-card{
+          width: 30%;
+          position: fixed;
+          right: 0;
+          height: 85%;
+          overflow: auto;
+          padding-top: 0;
+          margin-top: 15px;
+          padding-left: 0px;
+      }
+      .layui-form-item{
+          margin-bottom: 3px;
+      }
+      .layui-input{
+          height: 30px;
+      }
+      .layui-form-label{
+          padding: 5px 15px 5px 0px;
+          width: 85px;
+      }
+      .layui-input-block{
+          margin-left: 100px;
+      }
+  
+      .short-width{
+        width: 90px !important;
+      }
+
+      .medium-width{
+        width: 150px !important;
+      }
+  
+      .short-height{
+        min-height: 50px !important;
+        height: 50px;
+      }
+      
+      .long-width{
+        width: 290px !important;
+      }
+
+      .layui-icon-link:hover {
+          color: #1E9FFF;
+      }
+      
+  </style>
+  
+  
+<script>
+
+let currentPageSize = 10;
+
+layui.use(['admin', 'table', 'form', 'laydate'], function(){
+  var admin = layui.admin
+  ,setter = layui.setter
+  ,table = layui.table
+  ,element = layui.element
+  ,layer = layui.layer
+  ,laydate = layui.laydate
+  ,form = layui.form
+  $ = layui.$;
+  var currentEditData = {};
+
+  form.render();
+
+
+  if (serviceData.teamList && serviceData.teamList.length) {
+    $("#submitTeam-select").append(new Option("全部",0));
+    serviceData.teamList.forEach((team)=>{
+      $("#submitTeam-select").append(new Option(team.name,team.id));
+    });
+    form.render("select");
+  }
+
+  if (serviceData.authList && serviceData.authList.length) {
+    $("#submitAuth-select").append(new Option("全部",0));
+    serviceData.authList.forEach((team)=>{
+      $("#submitAuth-select").append(new Option(team.nickname,team.id));
+    });
+    form.render("select");
+  }
+
+  if (serviceData.stationList && serviceData.stationList.length) {
+    $("#station-select").append(new Option("全部",0));
+    serviceData.stationList.forEach((station)=>{
+      $("#station-select").append(new Option(station.title,station.id));
+    });
+    form.render("select");
+  }
+
+
+  $("#productEditView").hide();
+
+  $("#hideFormButton").click(function(){
+    $("#plugProductTable").removeClass("table-90-width")
+    $("#productEditView").hide();
+    return false;
+  });
+
+  table.on('row(plug-product-table)', function(obj){
+    currentIndex = obj.tr.data('index');
+    obj.tr.addClass('layui-table-click').siblings().removeClass('layui-table-click');
+    
+    var data = obj.data;
+    console.log('点击了行：',obj);
+    currentEditData = data;
+    loadEditViewWithData(data);
+
+  });
+
+  function loadEditViewWithData(data){
+    var newWidth = window.screen.width - 400;
+    $("#plugProductTable").addClass("table-90-width")
+    $("#productEditView").show();
+    
+    // 设置图片
+    $("#edit_image").attr("src", data.picture_url);
+    
+    // 设置表单数据
+    $("#edit_station_title").val(data.station_title);
+    $("#edit_asin").val(data.asin);
+    $("#edit_product_name").val(data.product_name);
+    $("#edit_seller").val(data.seller);
+    $("#edit_seller_count").val(data.seller_count);
+    $("#edit_shipping_method").val(data.shipping_method);
+    $("#edit_category").val(data.category);
+    $("#edit_rank").val(data.rank);
+    $("#edit_rating").val(data.rating);
+    $("#edit_brand_name").val(data.brand_name);
+    $("#edit_fba_fee").val(data.fba_fee);
+    $("#edit_price").val(data.price);
+    $("#edit_weight").val(data.weight);
+    $("#edit_profit_margin").val(data.profit_margin);
+    $("#edit_dimensions").val(data.dimensions);
+    $("#edit_picture_url").val(data.picture_url);
+    $("#edit_listing_date").val(data.listing_date);
+
+    // 重新渲染表单，使其生效
+    layui.form.render();
+    
+    console.log(data);
+  }
+
+  $("#searchBtn").click(function(){
+    renderPlugProductRecordsTable({page: 1, limit: currentPageSize});
+    return false;
+  });
+
+  $("#exportBtn").click(function(){
+    renderPlugProductRecordsTable({page: 1, limit: 99999, type: "export"});
+    return false;
+  });
+
+
+  function openAmazonDetailPage(stationId,asin) {
+    if (stationId == 13) { // 美国
+      url = 'http://www.amazon.com/dp/' + asin;
+    } else if (stationId == 12) { // 法国
+      url = 'http://www.amazon.fr/dp/' + asin;
+    } else if (stationId == 11) { // 澳大利亚
+      url = 'http://www.amazon.com.au/dp/' + asin;
+    } else if (stationId == 9) { // 日本
+      url = 'http://www.amazon.co.jp/dp/' + asin;
+    } else if (stationId == 8) { // 英国
+      url = 'http://www.amazon.co.uk/dp/' + asin;
+    } else if (stationId == 7) { // 加拿大
+      url = 'http://www.amazon.ca/dp/' + asin;
+    }
+    window.open(url);
+  }
+
+  $("#openDetailBtn").off('click').on('click', function() {
+    openAmazonDetailPage(currentEditData.station_id, currentEditData.asin);
+    return false;
+  });
+
+  $("#importProductBtn").click(function(data){
+
+    if (currentEditData.hasOwnProperty('has_product') && currentEditData.has_product == 1) {
+      layer.msg('该产品已存在', {icon: 2});
+      return false;
+    }
+
+    var userInfo = layui.data('layuiAdmin').userInfo;
+    
+
+    form.verify({
+      productName: function(value, item) {
+        const len = value.replace(/[\u4e00-\u9fa5]/g, 'aa').length;  // 将汉字计算为2个字符
+        if (len < 10) {  // 5个汉字 = 10个字符
+          return '产品名称至少需要5个汉字';
+        }
+        if (len > 30) {  // 15个汉字 = 30个字符
+          return '产品名称最多只能输入15个汉字';
+        }
+      }
+    });
+
+    // 加载站点数据
+    getRequest("/station/select", {
+        isTree: true,
+        page: 1,
+        initKey: 'id',
+        initValue: '',
+        select: true,
+        quick_search: ''
+    }, function(res){
+        if(res.code === 1){
+          layer.open({
+            type: 1,
+            title: '新增产品',
+            area: ['600px', '600px'],
+            content: $('#productAddView').html(),
+            success: function(layero, index){  // 在弹窗成功打开后执行
+
+              $(layero).find('input[name="submit_user_name"]').val(userInfo.nickname);
+              $(layero).find('input[name="submit_team_name"]').val(userInfo.team?userInfo.team.name:"");
+
+              $(layero).find('input[name="asin"]').val(currentEditData.asin);
+              //$(layero).find('input[name="product_name"]').val(currentEditData.product_name);
+              $(layero).find('input[name="brand"]').val(currentEditData.brand_name);
+              //$(layero).find('input[name="category"]').val(currentEditData.category);
+             // $(layero).find('input[name="category_rank"]').val(currentEditData.rank);
+              $(layero).find('input[name="weight"]').val(currentEditData.weight);
+              $(layero).find('input[name="fba_price"]').val(currentEditData.fba_fee);
+              $(layero).find('input[name="sale_price"]').val(currentEditData.price);
+              $(layero).find('input[name="image_url"]').val(currentEditData.picture_url);
+              
+
+                // 渲染下拉框数据
+                let selectHtml = '<option value="">请选择站点</option>';
+                res.data.list.forEach(item => {
+                    let selected = '';
+                    if (item.id == currentEditData.station_id) {
+                      selected = 'selected';
+                      $(layero).find('input[name="rate"]').val(item.rate);
+                    }
+                    selectHtml += `<option value="${item.id}" ${selected}>${item.title}</option>`;
+                    
+                });
+                $(layero).find('select[name=station_id]').html(selectHtml)
+                    .attr('lay-filter', 'stationSelect');
+
+                // 一定要在设置HTML后重新渲染表单,这样selected才会生效
+                form.render('select');
+                stationList = res.data.list;
+
+                // 重新绑定ASIN输入框失焦事件
+                $(layero).find('input[name="asin"]').on('blur', function(){
+                    console.log("检查asin1：", $(this).val());
+                    checkAsin(layero);
+                });
+
+                // 重新绑定ASIN检查按钮点击事件
+                $(layero).find('#checkAsinBtn').on('click', function(){
+                    console.log("检查asin：", $(layero).find('input[name="asin"]').val());
+                    checkAsin(layero);
+                });
+
+                // 修改站点选择监听事件
+                form.on('select(stationSelect)', function(data){
+                  // 从 stationList 中查找选中的站点数据
+                  let selectedStation = stationList.find(station => station.id == data.value);
+                  if (selectedStation) {
+                      // 使用就近查找的方式获取rate输入框
+                      $(data.elem).closest('.layui-form').find('input[name="rate"]').val(selectedStation.rate);
+                      checkAsin(layero);
+                  }
+                });
+
+                 // 重新绑定比例和比例系数点击事件
+                $(layero).find('input[name="ratio"], input[name="coefficient"]').on('click', function(){
+                  calculateRatio(layero);
+                });
+
+                 // 重新渲染表单元素
+                form.render(null, 'product-add-form');
+
+                 // 重新绑定表单提交事件
+                form.on('submit(product-add-form)', function(data){
+                  // 阻止表单默认提交行为
+                  data.form.preventDefault && data.form.preventDefault();
+
+                  console.log("提交表单数据：", data.field);  // 添加日志
+                  
+                  // 获取当前用户信息
+                  var userInfo = layui.data('layuiAdmin').userInfo;
+                  
+                  // 构建提交数据
+                  var submitData = {
+                      ...data.field,  // 使用手动收集的表单数据
+                      category_rank: 0,
+                      category: "null",
+                      reason: "",
+                      status: "1",
+                      weigh: "0",
+                      submit_user: userInfo.id,
+                      submit_team: userInfo.team?userInfo.team.id:0,
+                      state: "0"
+                  };
+
+                  postRequest('/product/add', submitData, function(res){
+                      if(res.code === 1) {
+                          layer.msg('添加成功', {icon: 1});
+                          layer.close(index);
+                          renderProductList({page: 1, limit: currentPageSize});
+                      } else {
+                          layer.msg(res.msg || '添加失败', {icon: 2});
+                      }
+                  });
+
+                  return false;
+                });
+
+            }
+          });
+        }
+    });
+
+    return false;
+  });
+
+  // 修改检查ASIN的函数，接收弹窗DOM参数
+  function checkAsin(layero) {
+    var asin = $(layero).find('input[name="asin"]').val();
+    var station_id = $(layero).find('select[name="station_id"]').val();
+    var category_rank = $(layero).find('input[name="category_rank"]').val();
+    var brand = $(layero).find('input[name="brand"]').val();
+
+    if(!asin || !station_id) {
+        return;
+    }
+
+    postRequest('/product/checkAsin', {
+        asin: asin,
+        station_id: station_id,
+        category_rank: category_rank,
+        brand: brand
+    }, function(res){
+        layer.msg(res.code === 1 ? "ASIN有效" : res.msg, {icon: res.code === 1 ? 1 : 2});
+    });
+  }
+
+  // 计算比例和比例系数
+  function calculateRatio(layero) {
+    var requiredFields = {
+        'station_id': '站点',
+        'rate': '汇率',
+        'weight': '重量',
+        'sale_price': '售价',
+        'purchase_price': '进价',
+        'fba_price': 'FBA费用'
+    };
+
+    var data = {};
+    var missingFields = [];
+
+    for(var field in requiredFields) {
+        var value = field === 'station_id' ? 
+            $(layero).find(`select[name='${field}']`).val() : 
+            $(layero).find(`input[name='${field}']`).val();
+        
+        if(!value) {
+            missingFields.push(requiredFields[field]);
+        }
+        data[field] = value;
+    }
+
+    if(missingFields.length > 0) {
+        layer.msg('请先填写：' + missingFields.join('、'), {icon: 2});
+        return;
+    }
+
+    // 获取当前用户信息
+    var userInfo = layui.data('layuiAdmin').userInfo;
+
+    // 构建完整的请求参数
+    var params = {
+        ...data,
+        category_rank: $(layero).find('input[name="category_rank"]').val(),
+        weight: $(layero).find('input[name="weight"]').val(),
+        status: "1",
+        weigh: "0",
+        submit_user: userInfo.id,
+        submit_team: userInfo.team_id,
+        state: "0",
+        asin: $(layero).find('input[name="asin"]').val(),
+        brand: $(layero).find('input[name="brand"]').val(),
+        category: $(layero).find('input[name="category"]').val(),
+        product_name: $(layero).find('input[name="product_name"]').val(),
+        image_url: $(layero).find('input[name="image_url"]').val(),
+        purchase_url: $(layero).find('input[name="purchase_url"]').val(),
+        remark: $(layero).find('textarea[name="remark"]').val()
+    };
+
+    postRequest('/product/calculateRatio', params, function(res){
+        if(res.code === 1) {
+            $(layero).find('input[name="ratio"]').val(res.data.ratio);
+            $(layero).find('input[name="coefficient"]').val(res.data.coefficient);
+        } else {
+            layer.msg(res.msg || '计算失败', {icon: 2});
+        }
+    });
+  }
+
+
+  renderPlugProductRecordsTable({page: 1, limit: 10});
+
+});
+
+function renderPlugProductRecordsTable(params){
+    var setter = layui.setter
+    var table = layui.table
+    var laypage = layui.laypage;
+
+    if(params.type != "export") {
+      currentPageSize = params.limit;
+    }
+    
+
+    var searchAsin = $("#search-asin").val();
+    var searchStatus = $("#status-select").val();
+    var searchSubmitUser = $("#submitAuth-select").val();
+    var searchSubmitTeam = $("#submitTeam-select").val();
+    var searchStation = $("#station-select").val();
+    var searchCategoryRank = $("#search-category_rank").val();
+    var searchWeight = $("#search-weight").val();
+    var searchShipping = $("#shipping-select").val();
+    var searchBrand = $("#brand-select").val();
+    var searchPrice = $("#search-price").val();
+    var searchProfitMargin = $("#search-profit_margin").val();
+    var searchPreview = $("#search-preview").val();
+    var searchSellerCount = $("#search-seller_count").val();
+    var searchReviewStatus = $("#review_status-select").val();
+    
+
+    if (searchSubmitUser != 0) {
+      params.createAdmin = searchSubmitUser;
+    }
+
+    if (searchSubmitTeam != 0) {
+      params.createTeam = searchSubmitTeam;
+    } 
+
+    if (searchAsin != null && searchAsin != "") {
+      params.asin = searchAsin;
+    }
+
+    if (searchStation != "") {
+        params.station = searchStation;
+    }
+
+    if (searchCategoryRank != null && searchCategoryRank != "") {
+        params.categoryRank = searchCategoryRank;
+    }
+
+    if (searchWeight != null && searchWeight != "") {
+        params.weight = searchWeight;
+    }
+
+    if (searchShipping != "") {
+        params.shipping = searchShipping;
+    }
+
+    if (searchBrand != "") {
+        params.brand = searchBrand;
+    }
+
+    if (searchPrice != null && searchPrice != "") {
+        params.price = searchPrice;
+    }
+
+    if (searchProfitMargin != null && searchProfitMargin != "") {
+        params.profitMargin = searchProfitMargin;
+    }
+
+    if (searchPreview != null && searchPreview != "") {
+        params.preview = searchPreview;
+    }
+
+    if (searchSellerCount != null && searchSellerCount != "") {
+        params.sellerCount = searchSellerCount;
+    }
+
+    if (searchReviewStatus != "") {
+        params.reviewStatus = searchReviewStatus;
+    }
+
+    if (searchStatus != 0) {
+        params.favoriteStatus = searchStatus;
+    }
+
+    console.log("params",params);
+
+    if (params.type == "export") {
+        getBlobRequest("/index/exportPlugProductRecord", params, (response) => {
+          try {
+              // 检查response是否是对象格式
+              if (response && response.blob) {
+                  // 创建blob对象
+                  const blob = new Blob([response.blob], {
+                      type: response.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                  });
+                  
+                  // 创建下载链接
+                  const url = window.URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = response.filename || '产品数据.xlsx';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  window.URL.revokeObjectURL(url);
+                  
+                  layer.msg('导出成功', {
+                      icon: 1,
+                      time: 2000
+                  });
+              } else {
+                  // 如果返回的是错误信息
+                  layer.msg(response.msg || '导出失败：返回数据格式错误', {
+                      icon: 2,
+                      time: 2000
+                  });
+              }
+          } catch(e) {
+              console.error('导出失败:', e);
+              layer.msg('导出失败: ' + e.message, {
+                  icon: 2,
+                  time: 2000
+              });
+          }
+      });
+      return;
+    }
+
+    var userInfo = layui.data('layuiAdmin').userInfo;
+
+    getRequest("/index/getPlugProductRecord",params,(res) => {
+        if (res.code != 1) {
+            if (res.code == 302) {
+                window.location.href = "/#/user/login"
+            }
+            layer.msg(res.msg || '数据获取失败', {
+                offset: '15px'
+                ,icon: 2
+                ,time: 1000
+            }, function(){ });
+            return;
+        }      
+        console.log("获取到列表：",res);
+
+        var cloudData = res.data;
+
+        table.render({
+            elem: '#plug-product-table'
+            ,data: cloudData.list
+            ,title: '插件产品数据'
+            ,cellMinWidth: 60
+            ,cellMinHeight: 100
+            ,page: false
+            ,limit: 10
+            ,cols: [[
+                {type: 'checkbox'},
+                {field:'id', title:'ID', width:90},
+                {field:'product_name', title:'商品标题', width:250, templet: function(d){
+                  return '<span style="white-space: break-spaces;">'+d.product_name+'</span>';
+                }},
+                {field:'picture_url', title:'图片', width:60, templet:'#imgTpl'},
+                {field:'create_admin_nickname', title:'首次采集(时间)', width:120, templet:'#createInfoTpl'},
+                {field:'update_admin_nickname', title:'更新数据(时间)', width:120, templet:'#updateInfoTpl'},
+                {field:'hasInProduct', title:'采集状态', width:100, templet: function(d){
+                  if(d.has_product == 1){
+                      return '<span style="color: #004706;">已采集</span><br/>'+d.pd_name;
+                  }else{
+                      return '<span style="color: #840101;">不存在</span>';
+                  }
+                }},
+                {field:'favorite', title:'收藏状态', width:130, templet: function(d){
+                  const favoriteUsers = d.favorite?d.favorite.replaceAll(",,",";").replaceAll(",","").split(";"):[];
+                  if(favoriteUsers.includes(userInfo.id+"")){
+                    return '<span style="color: #ecac05;">本人已收藏('+favoriteUsers.length+')</span>';
+                  } else if (favoriteUsers.length > 0 && d.favorite != ""){
+                    return '<span style="color: #840101;">其他人已收藏('+favoriteUsers.length+')</span>';
+                  } else {
+                    return '<span>无人收藏</span>';
+                  }
+                }},
+                {field:'asin', title:'ASIN', width:120},
+                {field:'station_title', title:'站点', width:120},
+                {field:'seller', title:'卖家', width:120},
+                {field:'seller_count', title:'卖家数量', width:100},
+                {field:'shipping_method', title:'配送方式', width:120},
+                {field:'category', title:'类目', width:120},
+                {field:'rank', title:'排名', width:100},
+                {field:'rating', title:'评分', width:90},
+                {field:'brand_name', title:'品牌名', width:120},
+                {field:'wipo_brand_registration_status', title:'注册状态(WIPO)', width:120, templet:'#wipoBrandRegisterInfoTpl'},
+                {field:'trademark_office_brand_registration_status', title:'注册状态(商标局)', width:120, templet:'#trademarkBrandRegisterInfoTpl'},
+                {field:'fba_fee', title:'FBA费用', width:100},
+                {field:'weight', title:'重量', width:100},
+                //{field:'dimensions', title:'尺寸', width:150},
+                {field:'profit_margin', title:'利润率', width:100},
+                {field:'price', title:'售价', width:100},
+                {field:'listing_date', title:'上架日期', width:120},
+                {field:'review_status', title:'评论状态', width:100},
+            ]],
+            done: function (res, curr, count) {
+                console.log(res,curr,count);
+                // 表格渲染完成后添加滚动事件监听
+                const tableContainer = document.querySelector('.layui-table-main');
+                if (tableContainer) {
+                    tableContainer.addEventListener('wheel', (e) => {
+                        if (e.ctrlKey) {
+                            // 阻止默认滚动行为
+                            e.preventDefault();
+                            // 实现左右滚动
+                            tableContainer.scrollLeft += e.deltaY;
+                        } else {
+                            // 不按住 Ctrl 键时，让浏览器默认处理上下滚动
+                        }
+                    });
+                }
+            }
+        });
+
+        laypage.render({
+            elem: "plug-product-pagebar",
+            count: cloudData.total,
+            curr: params.page,
+            limit: params.limit,
+            limits: [10,20,50,100, 200, 500],
+            layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip'], // 功能布局
+            jump: function(obj){
+                console.log('当前在第'+ params.page + '页，目标是第'+obj.curr+'页')
+                if (params.page == obj.curr && params.limit == obj.limit) {
+                console.log('不加载')
+                return;
+                }
+                console.log('开始加载')
+                params.page = obj.curr;
+                params.limit = obj.limit;
+                renderPlugProductRecordsTable(params);
+            }
+        });
+
+
+    });
+}
+
+</script>
+
+<style>
+    .image-hover-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .hover-image {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        background: #fff;
+        padding: 5px;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    
+    .hover-image img {
+        max-width: 400px;
+        max-height: 400px;
+    }
+    
+    .image-hover-wrapper:hover .hover-image {
+        display: block;
+    }
+</style>
+
+<script>
+    // 添加鼠标移动事件处理
+    $(document).on('mousemove', '.image-hover-wrapper', function(e) {
+        var $hoverImage = $(this).find('.hover-image');
+        var mouseX = e.pageX;
+        var mouseY = e.pageY;
+        var windowWidth = $(window).width();
+        var windowHeight = $(window).height();
+        var imageWidth = $hoverImage.width();
+        var imageHeight = $hoverImage.height();
+        
+        // 根据鼠标位置调整大图显示位置
+        var left = mouseX + 20;
+        var top = mouseY + 20;
+        
+        // 确保大图不会超出窗口边界
+        if (left + imageWidth > windowWidth) {
+            left = mouseX - imageWidth - 20;
+        }
+        if (top + imageHeight > windowHeight) {
+            top = mouseY - imageHeight - 20;
+        }
+        
+        $hoverImage.css({
+            left: left + 'px',
+            top: top + 'px'
+        });
+    });
+</script>
+

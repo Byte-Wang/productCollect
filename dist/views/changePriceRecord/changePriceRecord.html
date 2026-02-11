@@ -1,0 +1,320 @@
+<div class="layui-fluid" id="priceChangeRecordContainer">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-body">
+          <form class="layui-form layui-form-pane" lay-filter="price-change-search-form" id="price-change-search-form" style="margin-bottom:12px;">
+            <div class="layui-form-item">
+              <div class="layui-inline">
+                <label class="layui-form-label">创建时间</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="price-change-create-start-date" placeholder="开始时间" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="price-change-create-end-date" placeholder="结束时间" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <!-- <div class="layui-inline">
+                <label class="layui-form-label">类型</label>
+                <div class="layui-input-inline" style="width:160px;">
+                  <select id="price-change-type" name="type">
+                    <option value="">全部</option>
+                    <option value="1"></option>
+                    <option value="2">2</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline" style="width:160px;">
+                  <select id="price-change-status" name="status">
+                    <option value="">全部</option>
+                    <option value="1">1</option>
+                    <option value="0">0</option>
+                  </select>
+                </div>
+              </div> -->
+
+              <div class="layui-inline">
+                <label class="layui-form-label">SKU</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="price-change-sku" placeholder="SKU" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">ASIN</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="price-change-asin" placeholder="ASIN" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">站点</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="price-change-region-name" placeholder="站点名称" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">店铺</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="price-change-store-name" placeholder="店铺名称" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <!-- <div class="layui-inline">
+                <label class="layui-form-label">售卖状态</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="price-change-sales-status" placeholder="售卖状态" autocomplete="off" class="layui-input">
+                </div>
+              </div> -->
+
+              <div class="layui-inline">
+                <label class="layui-form-label">操作人</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <select id="price-change-operator" name="operator_user_id" lay-search>
+                    <option value="">全部</option>
+                  </select>
+                </div>
+              </div>
+<!-- 
+              <div class="layui-inline">
+                <label class="layui-form-label">原价区间</label>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" step="0.01" id="price-change-original-min" placeholder="最小" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" step="0.01" id="price-change-original-max" placeholder="最大" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">新价区间</label>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" step="0.01" id="price-change-new-min" placeholder="最小" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" step="0.01" id="price-change-new-max" placeholder="最大" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">总成本区间</label>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" step="0.01" id="price-change-total-min" placeholder="最小" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" step="0.01" id="price-change-total-max" placeholder="最大" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">库存区间</label>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" id="price-change-stock-min" placeholder="最小" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" id="price-change-stock-max" placeholder="最大" autocomplete="off" class="layui-input">
+                </div>
+              </div> -->
+
+              <div class="layui-inline">
+                <button class="layui-btn" lay-submit lay-filter="price-change-search-submit" id="price-change-search-btn">查询</button>
+                <button class="layui-btn layui-btn-primary" id="price-change-export-btn">导出</button>
+              </div>
+            </div>
+          </form>
+
+          <table class="layui-hide" id="price-change-record-table" lay-filter="price-change-record-table"></table>
+          <div class="layui-card" id="price-change-record-pagebar"></div>
+
+          <script type="text/html" id="skuTpl">
+            <span style="color:#1E9FFF;">{{ d.sku }}</span>
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentPageSize = 10;
+
+function getPriceChangeSearchParams(){
+  var params = {};
+  var start = document.getElementById('price-change-create-start-date') ? document.getElementById('price-change-create-start-date').value : '';
+  var end = document.getElementById('price-change-create-end-date') ? document.getElementById('price-change-create-end-date').value : '';
+  var type = 1;//document.getElementById('price-change-type') ? document.getElementById('price-change-type').value : '';
+  var status = 1;//document.getElementById('price-change-status') ? document.getElementById('price-change-status').value : '';
+  var sku = document.getElementById('price-change-sku') ? document.getElementById('price-change-sku').value : '';
+  var asin = document.getElementById('price-change-asin') ? document.getElementById('price-change-asin').value : '';
+  var regionName = document.getElementById('price-change-region-name') ? document.getElementById('price-change-region-name').value : '';
+  var storeName = document.getElementById('price-change-store-name') ? document.getElementById('price-change-store-name').value : '';
+  var salesStatus = document.getElementById('price-change-sales-status') ? document.getElementById('price-change-sales-status').value : '';
+  var operatorUserId = document.getElementById('price-change-operator') ? document.getElementById('price-change-operator').value : '';
+  var originalMin = document.getElementById('price-change-original-min') ? document.getElementById('price-change-original-min').value : '';
+  var originalMax = document.getElementById('price-change-original-max') ? document.getElementById('price-change-original-max').value : '';
+  var newMin = document.getElementById('price-change-new-min') ? document.getElementById('price-change-new-min').value : '';
+  var newMax = document.getElementById('price-change-new-max') ? document.getElementById('price-change-new-max').value : '';
+  var totalMin = document.getElementById('price-change-total-min') ? document.getElementById('price-change-total-min').value : '';
+  var totalMax = document.getElementById('price-change-total-max') ? document.getElementById('price-change-total-max').value : '';
+  var stockMin = document.getElementById('price-change-stock-min') ? document.getElementById('price-change-stock-min').value : '';
+  var stockMax = document.getElementById('price-change-stock-max') ? document.getElementById('price-change-stock-max').value : '';
+
+  if (start) params.created_time_start = start;
+  if (end) params.created_time_end = end;
+  if (type !== '') params.type = type;
+  if (status !== '') params.status = status;
+  if (sku) params.sku = sku;
+  if (asin) params.asin = asin;
+  if (regionName) params.region_name = regionName;
+  if (storeName) params.store_name = storeName;
+  if (salesStatus) params.sales_status = salesStatus;
+  if (operatorUserId !== '') params.operator_user_id = operatorUserId;
+  if (originalMin !== '') params.original_price_min = Number(originalMin);
+  if (originalMax !== '') params.original_price_max = Number(originalMax);
+  if (newMin !== '') params.new_price_min = Number(newMin);
+  if (newMax !== '') params.new_price_max = Number(newMax);
+  if (totalMin !== '') params.total_cost_min = Number(totalMin);
+  if (totalMax !== '') params.total_cost_max = Number(totalMax);
+  if (stockMin !== '') params.stock_min = Number(stockMin);
+  if (stockMax !== '') params.stock_max = Number(stockMax);
+  return params;
+}
+
+function renderPriceChangeRecordTable(params){
+  var table = layui.table;
+  var laypage = layui.laypage;
+  if (params.type != 'export') {
+    currentPageSize = params.limit;
+  }
+
+  if (params.type == 'export') {
+    var exportParams = Object.assign({}, params);
+    getBlobRequest('/index/exportPriceChangeRecord', exportParams, function(response){
+      try {
+        if (response && response.blob) {
+          const blob = new Blob([response.blob], {
+            type: response.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = response.filename || '改价记录数据.xlsx';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          layer.msg('导出成功', { icon: 1, time: 2000 });
+        } else {
+          layer.msg(response && response.msg ? response.msg : '导出失败：返回数据格式错误', { icon: 2, time: 2000 });
+        }
+      } catch(e) {
+        console.error('导出失败:', e);
+        layer.msg('导出失败: ' + e.message, { icon: 2, time: 2000 });
+      }
+    });
+    return;
+  }
+
+  getRequest('/index/getPriceChangeRecord', params, function(res){
+    if (res.code != 1) {
+      layer.msg(res.msg || '数据获取失败', {offset:'15px', icon:2, time:1000});
+      return;
+    }
+    var cloudData = res.data || {list:[], total:0};
+
+    table.render({
+      elem: '#price-change-record-table',
+      data: cloudData.list,
+      title: '改价记录数据',
+      cellMinWidth: 60,
+      page: false,
+      limit: params.limit,
+      cols: [[
+        {field:'id', title:'ID', width:90},
+        {field:'sku', title:'SKU', width:160, templet:'#skuTpl'},
+        {field:'product_title', title:'产品标题', width:300},
+        {field:'asin', title:'ASIN', width:120},
+        {field:'region_name', title:'站点', width:160},
+        {field:'original_price', title:'原价', width:100},
+        {field:'new_price', title:'新价', width:100},
+        {field:'total_cost', title:'总成本', width:100},
+        // {field:'type', title:'类型', width:90},
+        {field:'sales_status', title:'售卖状态', width:120},
+        // {field:'status', title:'状态', width:90},
+        {field:'stock', title:'库存', width:100},
+        {field:'store_name', title:'店铺', width:160},
+        {field:'operator_username', title:'操作人', width:120},
+        {field:'created_time', title:'创建时间', width:160}
+      ]],
+      done: function(res, curr, count){
+        // 可添加滚动或其他效果
+      }
+    });
+
+    laypage.render({
+      elem: 'price-change-record-pagebar',
+      count: cloudData.total,
+      curr: params.page,
+      limit: params.limit,
+      limits: [10,20,50,100],
+      layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip'],
+      jump: function(obj){
+        var sp = getPriceChangeSearchParams();
+        if (params.page == obj.curr && params.limit == obj.limit) return;
+        renderPriceChangeRecordTable(Object.assign({}, sp, {page: obj.curr, limit: obj.limit}));
+      }
+    });
+  });
+}
+
+layui.use(['table','form','laypage','laydate'], function(){
+  var form = layui.form, laydate = layui.laydate;
+
+  laydate.render({ elem: '#price-change-create-start-date', type: 'datetime' });
+  laydate.render({ elem: '#price-change-create-end-date', type: 'datetime' });
+
+  function fillOperatorOptions(list){
+    var sel = layui.$('#price-change-operator');
+    sel.empty();
+    sel.append(new Option('全部', ''));
+    list.forEach(function(user){
+      sel.append(new Option(user.nickname, user.id));
+    });
+    form.render('select');
+  }
+
+  if (window.serviceData && Array.isArray(serviceData.authList) && serviceData.authList.length){
+    fillOperatorOptions(serviceData.authList);
+  } else if (typeof addListen === 'function') {
+    addListen(function(key, value){
+      if (key === 'authList' && Array.isArray(value)){
+        fillOperatorOptions(value);
+      }
+    });
+  }
+
+  layui.$('#price-change-export-btn').click(function(){
+    var sp = getPriceChangeSearchParams();
+    renderPriceChangeRecordTable(Object.assign({page: 1, limit: 99999, type: 'export'}, sp));
+    return false;
+  });
+
+  form.on('submit(price-change-search-submit)', function(){
+    var sp = getPriceChangeSearchParams();
+    renderPriceChangeRecordTable(Object.assign({page:1, limit: currentPageSize}, sp));
+    return false;
+  });
+
+  renderPriceChangeRecordTable(Object.assign({page:1, limit: currentPageSize}, getPriceChangeSearchParams()));
+});
+</script>

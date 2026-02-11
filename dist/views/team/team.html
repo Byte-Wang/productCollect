@@ -1,0 +1,422 @@
+
+<div class="layui-fluid" id="teamTable">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-body">
+            <form class="layui-form" action="" lay-filter="component-form-group">
+                <div class="layui-form-item"> 
+                    <div class="layui-inline"> 
+                        <button type="button" class="layui-btn" id="addTeamBtn">新增</button>  
+                    </div>  
+                </div>  
+            </form>
+  
+            <table class="layui-hide" id="team-table" lay-filter="team-table"></table>
+            <div class="layui-card" id="team-pagebar"></div>
+
+            <script type="text/html" id="principalTpl">
+                <span>{{ d.principal_info.nickname }}</span>
+            </script>
+
+            <script type="text/html" id="updateTimeTpl">
+                {{ layui.util.toDateString(d.update_time * 1000, 'yyyy-MM-dd HH:mm:ss') }}
+            </script>
+
+            <script type="text/html" id="createTimeTpl">
+                {{ layui.util.toDateString(d.create_time * 1000, 'yyyy-MM-dd HH:mm:ss') }}
+            </script>
+
+            <script type="text/html" id="operationTpl">
+              <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+              <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+            </script>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加新增团队的弹出层模板 -->
+<script type="text/html" id="addTeamTpl">
+    <form class="layui-form" id="addTeamForm" lay-filter="addTeamForm" style="padding: 20px;">
+      <div class="layui-form-item">
+        <label class="layui-form-label">团队名</label>
+        <div class="layui-input-block">
+          <input type="text" name="name" required lay-verify="required" placeholder="请输入团队名" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">团队负责人</label>
+        <div class="layui-input-block">
+          <select name="principal">
+            <option value="">请选择负责人</option>
+          </select>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">所属大区</label>
+        <div class="layui-input-block">
+          <select name="team_area_id">
+            <option value="">请选择所属大区</option>
+          </select>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+          <textarea name="note_textarea" placeholder="请输入备注" class="layui-textarea"></textarea>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn" lay-submit lay-filter="addTeamSubmit">保存</button>
+          <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+      </div>
+    </form>
+</script>
+  
+  <style>
+      .radio-wrap {
+        display: flex;
+        flex-wrap: wrap; /* 当内容超出容器宽度时自动换行 */
+      }
+      .radio-wrap .layui-input-block {
+        margin: 0; /* 移除默认外边距 */
+        padding: 5px; /* 可选：添加内边距以增加间距 */
+      }
+      .radio-wrap .layui-input-block div {
+        margin-bottom: 10px; /* 单选按钮之间的垂直间距 */
+      }
+      .edit-float-img{
+        position: absolute;
+        right: 30px;
+        border: 1px solid #333;
+      }
+      .layui-table-click{
+        background-color: #d0d0d0;
+      }
+      
+      .layui-table-cell{
+          max-height: 40px;
+          /* line-height: 70px; */
+      }
+  
+      .table-90-width{
+         width: 67%;
+          position: fixed;
+          left: 0;
+          overflow: auto;
+          height: 85%;
+      }
+      .table-edit-card{
+          width: 30%;
+          position: fixed;
+          right: 0;
+          height: 85%;
+          overflow: auto;
+          padding-top: 0;
+          margin-top: 15px;
+          padding-left: 0px;
+      }
+      .layui-form-item{
+          margin-bottom: 3px;
+      }
+      .layui-input{
+          height: 30px;
+      }
+      .layui-form-label{
+          padding: 5px 15px 5px 0px;
+          width: 85px;
+      }
+      .layui-input-block{
+          margin-left: 100px;
+      }
+  
+      .short-width{
+        width: 90px !important;
+      }
+  
+      .short-height{
+        min-height: 50px !important;
+        height: 50px;
+      }
+      
+      .long-width{
+        width: 290px !important;
+      }
+      
+  </style>
+  
+  
+<script>
+
+let currentPageSize = 10;
+
+layui.use(['admin', 'table', 'form', 'laydate'], function(){
+  var admin = layui.admin
+  ,setter = layui.setter
+  ,table = layui.table
+  ,element = layui.element
+  ,layer = layui.layer
+  ,laydate = layui.laydate
+  ,form = layui.form
+  $ = layui.$;
+
+
+  renderTeamTable({page: 1, limit: 10});
+  renderPrepareList();
+
+  // 新增按钮点击事件
+  $('#addTeamBtn').on('click', function(){
+
+        // 打开弹出层
+        layer.open({
+          type: 1,
+          title: '新增团队',
+          area: ['500px', '400px'],
+          content: $('#addTeamTpl').html(),
+          success: function(){
+            // 渲染下拉框数据
+            let selectHtml = '<option value="">请选择负责人</option>';
+            globalUserList.forEach(item => {
+              selectHtml += `<option value="${item.id}">${item.nickname}</option>`;
+            });
+            $('select[name=principal]').html(selectHtml);
+
+
+            let teamAreaSelectHtml = '<option value="">所属大区</option>';
+            globalTeamAreaList.forEach(item => {
+              teamAreaSelectHtml += `<option value="${item.id}">${item.name}</option>`;
+            });
+            $('select[name=team_area_id]').html(teamAreaSelectHtml);
+
+
+            form.render('select');
+          }
+        });
+  });
+
+  // 表单提交事件
+  form.on('submit(addTeamSubmit)', function(data){
+    let postData = {
+      ...data.field,
+      status: "1"
+    };
+    
+    postRequest('/team/add', postData, function(res){
+      if(res.code == 1){
+        layer.msg('添加成功', {icon: 1});
+        layer.closeAll('page');
+        // 刷新表格
+        renderTeamTable({page: 1, limit: currentPageSize});
+      } else {
+        layer.msg(res.msg || '添加失败', {icon: 2});
+      }
+    });
+
+    return false;
+  });
+
+  // 修改编辑表单提交事件
+  form.on('submit(editTeamSubmit)', function(data){
+    let editId = $('#addTeamForm').data('editId');
+    let postData = {
+        ...data.field,
+        id: editId,
+        status: "1"
+    };
+    
+    postRequest('/team/edit', postData, function(res){
+        if(res.code == 1){
+            layer.msg('修改成功', {icon: 1});
+            layer.closeAll('page');
+            // 刷新表格
+            renderTeamTable({page: 1, limit: currentPageSize});
+        } else {
+            layer.msg(res.msg || '修改失败', {icon: 2});
+        }
+    });
+
+    return false;
+  });
+
+});
+
+// 定义一个全局变量来临时存储用户列表
+let globalUserList = [];
+let globalTeamAreaList = [];
+
+function renderPrepareList(){
+  getRequest("/auth.admin/select", {
+      isTree: true,
+      page: 1,
+      limit: 9999,
+      initKey: 'id',
+      initValue: '',
+      select: true,
+      quick_search: ''
+  }, function(res){
+      if(res.code == 1){
+        globalUserList = res.data.list || [];
+      }
+  });
+
+    getRequest("/index/getTeamArea", {
+      page: 1,
+      limit: 9999,
+    }, (res) => {
+      if(res.code == 1){
+        globalTeamAreaList = res.data.list || [];
+      }
+    });
+}
+
+function renderTeamTable(params){
+    var setter = layui.setter
+    var table = layui.table
+    var laypage = layui.laypage;
+    var form = layui.form;
+
+    currentPageSize = params.limit;
+
+    getRequest("/team/index",params,(res) => {
+        if (res.code != 1) {
+            if (res.code == 302) {
+                window.location.href = "/#/user/login"
+            }
+            layer.msg(res.msg || '数据获取失败', {
+                offset: '15px'
+                ,icon: 2
+                ,time: 1000
+            }, function(){ });
+            return;
+        }      
+        console.log("取到列表：",res);
+
+        var cloudData = res.data;
+
+        table.render({
+            elem: '#team-table'
+            ,data: cloudData.list
+            ,title: '插件产品数据'
+            ,cellMinWidth: 60
+            ,cellMinHeight: 100
+            ,page: false
+            ,limit: 10
+            ,cols: [[
+                {type: 'checkbox'},
+                {field:'id', title:'ID', width:90},
+                {field:'name', title:'名称', width:120},
+                {field:'principal_manager', title:'团队负责人', width:120, templet: function(d){
+                  if (d.principal_info) {
+                    return d.principal_info.nickname
+                  }
+                  return '<span style="color: #cdcbcb;">未设置</span>';
+                }},
+                {field:'team_area_name', title:'所属大区', width:120, templet: function(d){
+                  if(d.team_area_id == 0){
+                      return '<span style="color: #cdcbcb;">无归属</span>';
+                  }else{
+                      return '<span style="color: #000;">'+d.team_area_info.name+'</span>';
+                  }
+                }},
+                {field:'update_time', title:'更新时间', width:120, templet:'#updateTimeTpl'},
+                {field:'create_time', title:'创建时间', width:120, templet:'#createTimeTpl'},
+                {title:'操作', width:150, templet:'#operationTpl', fixed:'right'}
+            ]],
+            done: function (res, curr, count) {
+                console.log(res,curr,count);
+            }
+        });
+
+        laypage.render({
+            elem: "team-pagebar",
+            count: cloudData.total,
+            curr: params.page,
+            limit: params.limit,
+            layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip'], // 功能布局
+            jump: function(obj){
+                console.log('当前在第'+ params.page + '页，目标是第'+obj.curr+'页')
+                if (params.page == obj.curr && params.limit == obj.limit) {
+                console.log('不加载')
+                return;
+                }
+                console.log('开始加载')
+                params.page = obj.curr;
+                params.limit = obj.limit;
+                renderTeamTable(params);
+            }
+        });
+
+        table.on('tool(team-table)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                // 直接打开弹出层,使用全局变量中的数据
+                layer.open({
+                    type: 1,
+                    title: '编辑团队',
+                    area: ['500px', '400px'],
+                    content: $('#addTeamTpl').html(),
+                    success: function(){
+                        // 渲染负责人下拉框
+                        let selectHtml = '<option value="">请选择负责人</option>';
+                        globalUserList.forEach(item => {
+                            selectHtml += `<option value="${item.id}">${item.nickname}</option>`;
+                        });
+                        $('select[name=principal]').html(selectHtml);
+                    
+                        // 渲染团队大区下拉框
+                        let teamAreaSelectHtml = '<option value="">所属大区</option>';
+                        globalTeamAreaList.forEach(item => {
+                            teamAreaSelectHtml += `<option value="${item.id}">${item.name}</option>`;
+                        });
+                        $('select[name=team_area_id]').html(teamAreaSelectHtml);
+                    
+                        console.log('编辑数据',data);
+                        
+                        // 设置表单值
+                        form.val('addTeamForm', {
+                            'name': data.name,
+                            'principal': data.principal_info ? data.principal_info.id : '',
+                            'team_area_id': data.team_area_id || '',
+                            'note_textarea': data.note_textarea || ''
+                        });
+                        
+                        // 重新渲染表单
+                        form.render();
+                        
+                        // 存储当前编辑的数据ID到表单中
+                        $('#addTeamForm').data('editId', data.id);
+                        
+                        // 修改提交按钮的 lay-filter
+                        $('#addTeamForm button[lay-filter="addTeamSubmit"]').attr('lay-filter', 'editTeamSubmit');
+                    }
+                });
+            } else if(obj.event === 'del'){
+                layer.confirm('确认删除该记录？', function(index){
+                    // 调用删除接口
+                    delRequest('/team/del', {ids: [data.id]}, function(res){
+                        if(res.code == 1){
+                            layer.msg('删除成功', {icon: 1});
+                            obj.del(); // 删除对应行
+                            layer.close(index);
+                            // 刷新表格
+                            renderTeamTable({page: 1, limit: currentPageSize});
+                        } else {
+                            layer.msg(res.msg || '删除失败', {icon: 2});
+                        }
+                    });
+                });
+            }
+        });
+
+    });
+}
+
+
+
+</script>
+

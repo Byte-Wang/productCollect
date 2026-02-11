@@ -1,0 +1,416 @@
+<div class="layui-fluid">
+    <!-- 公司简报 -->
+    <div class="layui-row layui-col-space15" id="company-box">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">公司简报</div>
+                <div class="layui-card-body">
+                    <form class="layui-form" lay-filter="company-form">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label">站点</label>
+                                <div class="layui-input-inline">
+                                    <select name="station_id" lay-filter="station-filter">
+                                        <option value="">请选择站点</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">团队</label>
+                                <div class="layui-input-inline">
+                                    <select name="team_id" lay-filter="team-filter">
+                                        <option value="">请选择团队</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">开始日期</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="start_date" id="company-start-date" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">结束日期</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="end_date" id="company-end-date" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <button class="layui-btn" lay-submit lay-filter="company-search">查询</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="layui-row layui-col-space15">
+                        <div class="layui-col-md8">
+                            <div id="company-chart" style="height: 300px;"></div>
+                        </div>
+                        <div class="layui-col-md4">
+                            <div id="company-stats" class="layui-row layui-col-space10">
+                                <!-- 数据卡片将在这里动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 审核员简报 -->
+    <div class="layui-row layui-col-space15" id="auditor-box">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">审核员简报</div>
+                <div class="layui-card-body">
+                    <form class="layui-form" lay-filter="auditor-form">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label">站点</label>
+                                <div class="layui-input-inline">
+                                    <select name="station_id" lay-filter="station-filter">
+                                        <option value="">请选择站点</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">审核员</label>
+                                <div class="layui-input-inline">
+                                    <select name="user_id" lay-filter="auditor-filter">
+                                        <option value="">请选择审核员</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">开始日期</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="start_date" id="auditor-start-date" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">结束日期</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="end_date" id="auditor-end-date" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <button class="layui-btn" lay-submit lay-filter="auditor-search">查询</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="layui-row layui-col-space15">
+                        <div class="layui-col-md8">
+                            <div id="auditor-chart" style="height: 300px;"></div>
+                        </div>
+                        <div class="layui-col-md4">
+                            <div id="auditor-stats" class="layui-row layui-col-space10">
+                                <!-- 数据卡片将在这里动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人简报 -->
+    <div class="layui-row layui-col-space15" id="personal-box">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">个人简报</div>
+                <div class="layui-card-body">
+                    <form class="layui-form" lay-filter="personal-form">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label">站点</label>
+                                <div class="layui-input-inline">
+                                    <select name="station_id" lay-filter="station-filter">
+                                        <option value="">请选择站点</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">开始日期</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="start_date" id="personal-start-date" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">结束日期</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="end_date" id="personal-end-date" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <button class="layui-btn" lay-submit lay-filter="personal-search">查询</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="layui-row layui-col-space15">
+                        <div class="layui-col-md8">
+                            <div id="personal-chart" style="height: 300px;"></div>
+                        </div>
+                        <div class="layui-col-md4">
+                            <div id="personal-stats" class="layui-row layui-col-space10">
+                                <!-- 数据卡片将在这里动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+layui.use(['form', 'laydate', 'echarts'], function(){
+    var form = layui.form
+    ,laydate = layui.laydate
+    ,echarts = layui.echarts
+    ,$ = layui.$;
+
+    // 统计数据映射
+    const statsMap = {
+        total: '总数据',
+        pending: '待审核',
+        first_pass: '初审通过',
+        reject: '已驳回',
+        pass: '已通过',
+        pending_tow: '待二审',
+        dispute: '异议二审',
+        cancel: '无效数据'
+    };
+
+    // 初始化图表
+    const charts = {
+        company: echarts.init(document.getElementById('company-chart')),
+        auditor: echarts.init(document.getElementById('auditor-chart')),
+        personal: echarts.init(document.getElementById('personal-chart'))
+    };
+
+    // 渲染统计数据
+    function renderStats(data, containerId) {
+        let html = '';
+        for(let key in statsMap) {
+            html += `
+                <div class="layui-col-md6">
+                    <div class="layui-card stat-card">
+                        <div class="layui-card-body">
+                            <span class="stat-label">${statsMap[key]}</span>
+                            <span class="stat-value">${data[key] || 0}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        $('#' + containerId).html(html);
+    }
+
+    // 渲染图表
+    function renderChart(data, chart) {
+        const option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value'
+            },
+            yAxis: {
+                type: 'category',
+                data: Object.values(statsMap)
+            },
+            series: [{
+                name: '数量',
+                type: 'bar',
+                data: Object.keys(statsMap).map(key => data[key] || 0)
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    // 加载报表数据
+    function loadBulletin(params, containerId, chart) {
+        getRequest("/index/bulletin", params, function(res) {
+            if(res.code === 1) {
+                renderStats(res.data, containerId);
+                renderChart(res.data, chart);
+            }
+        });
+    }
+
+    // 加载站点数据
+    function loadStations() {
+        getRequest("/station/select", {}, function(res) {
+            if(res.code === 1) {
+                let options = '<option value="">请选择站点</option>';
+                res.data.list.forEach(function(item) {
+                    options += `<option value="${item.id}">${item.title}</option>`;
+                });
+                $('select[name="station_id"]').html(options);
+                form.render('select');
+            }
+        });
+    }
+
+    // 加载团队数据
+    function loadTeams() {
+        getRequest("/team/select", {}, function(res) {
+            if(res.code === 1) {
+                let options = '<option value="">请选择团队</option>';
+                res.data.list.forEach(function(item) {
+                    options += `<option value="${item.id}">${item.name}</option>`;
+                });
+                $('select[name="team_id"]').html(options);
+                form.render('select');
+            }
+        });
+    }
+
+    // 加载审核员数据
+    function loadAuditors() {
+        getRequest("/product/allotSelect", {}, function(res) {
+            if(res.code === 1) {
+                let options = '<option value="">请选择审核员</option>';
+                res.data.list.forEach(function(item) {
+                    options += `<option value="${item.id}">${item.nickname}</option>`;
+                });
+                $('select[name="user_id"]').html(options);
+                form.render('select');
+            }
+        });
+    }
+
+    // 获取最近7天的日期范围
+    function getLastWeekDate() {
+        const end = new Date();
+        const start = new Date();
+        start.setDate(start.getDate() - 6); // 减6天，加上今天共7天
+        
+        return {
+            start_date: layui.util.toDateString(start, 'yyyy-MM-dd'),
+            end_date: layui.util.toDateString(end, 'yyyy-MM-dd')
+        };
+    }
+
+    // 初始化日期选择器时设置默认值
+    ['company', 'auditor', 'personal'].forEach(function(prefix) {
+        const dateRange = getLastWeekDate();
+        
+        laydate.render({
+            elem: '#' + prefix + '-start-date',
+            value: dateRange.start_date
+        });
+        laydate.render({
+            elem: '#' + prefix + '-end-date',
+            value: dateRange.end_date
+        });
+    });
+
+    // 初始化数据
+    loadStations();
+    loadTeams();
+    loadAuditors();
+
+
+    // 修改表单提交处理
+    form.on('submit(company-search)', function(data){
+        loadBulletin({
+            type: 1,
+            ...data.field
+        }, 'company-stats', charts.company);
+        return false;
+    });
+
+    form.on('submit(auditor-search)', function(data){
+        loadBulletin({
+            type: 2,
+            ...data.field
+        }, 'auditor-stats', charts.auditor);
+        return false;
+    });
+
+    form.on('submit(personal-search)', function(data){
+        loadBulletin({
+            type: 0,
+            ...data.field
+        }, 'personal-stats', charts.personal);
+        return false;
+    });
+
+    // 修改默认加载数据的参数
+    const defaultParams = getLastWeekDate();
+
+    var userInfo = layui.data('layuiAdmin').userInfo;
+    if (userInfo.group_arr.includes(1) || userInfo.group_arr.includes(3)  || userInfo.group_arr.includes(5)) { //管理员
+         // 加载默认数据
+        loadBulletin({type: 1, ...defaultParams}, 'company-stats', charts.company);
+        loadBulletin({type: 2, ...defaultParams}, 'auditor-stats', charts.auditor);
+        loadBulletin({type: 0, ...defaultParams}, 'personal-stats', charts.personal);
+    } else if (userInfo.group_arr.includes(2)) {  // 审核元
+        loadBulletin({type: 1, ...defaultParams}, 'company-stats', charts.company);
+        loadBulletin({type: 0, ...defaultParams}, 'personal-stats', charts.personal);
+        $("#auditor-box").hide();
+    }else if  (userInfo.group_arr.includes(4)) { //采集员
+        loadBulletin({type: 0, ...defaultParams}, 'personal-stats', charts.personal);
+        $("#company-box").hide();
+        $("#auditor-box").hide();
+    }
+
+   
+
+    // 窗口大小改变时重绘图表
+    window.addEventListener('resize', function() {
+        Object.values(charts).forEach(chart => chart.resize());
+    });
+});
+</script>
+
+<style>
+.layui-card-header {
+    font-weight: bold;
+}
+
+.stat-card {
+    margin-bottom: 10px;
+}
+
+.stat-card .layui-card-body {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 14px;
+}
+
+.stat-value {
+    color: #009688;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.layui-form {
+    margin-bottom: 20px;
+}
+
+.layui-card {
+    margin-bottom: 15px;
+}
+
+#company-stats,
+#auditor-stats,
+#personal-stats {
+    max-height: 300px;
+    overflow-y: auto;
+}
+</style>

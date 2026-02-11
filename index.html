@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>亚马逊商品采集系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <title>产品采集系统</title>
+</head>
+<body>
+    <!-- <div class="layui-row">
+        <ul class="layui-nav" lay-filter="component-nav">
+            <li class="layui-nav-item layui-this"><a href="javascript:;">首页</a></li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">用户管理</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;">角色管理</a></dd>
+                    <dd><a href="javascript:;">用户管理</a></dd>
+                    <dd><a href="javascript:;">团队管理</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="javascript:;">商品管理</a></li>
+            <li class="layui-nav-item"><a href="javascript:;">查询</a></li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">系统配置</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;">公告管理</a></dd>
+                    <dd><a href="javascript:;">站点管理</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </div> -->
+    <div id="LAY_app"></div>
+    <script src="layui/layui.js"></script>
+    <script src="layui/main.js"></script>
+    <script src="dist/lib/extend/xlsx.full.min.js"></script>
+    <script>
+        layui.config({
+            base: './dist/',       // 设定 Layui 扩展模块的所在目录，一般与 extend 方法搭配使用
+            // version: false, // 用于更新模块缓存，默认 false。若设为 true，即让浏览器不缓存。也可设为一个任意数值
+            // dir: 'layui/',  // layui 基础目录，用于动态导入 src/layui.js 时的内置模块的加载。一般无需设置
+            // debug: false    // 用于开启调试模式，默认 false。若设为 true，则模块的引入节点会保留在页面
+        }).use('index', function(){
+            
+        });
+    </script>
+</body>
+</html>

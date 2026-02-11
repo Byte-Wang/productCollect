@@ -1,0 +1,400 @@
+<div class="layui-fluid" id="recordDashboardContainer">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">店铺数据看板</div>
+        <div class="layui-card-body">
+          <form class="layui-form layui-form-pane" lay-filter="dashboard-search-form" id="dashboard-search-form" style="margin-bottom:12px;">
+            <div class="layui-form-item">
+              <div class="layui-inline">
+                <label class="layui-form-label">店铺名称</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="dashboard-store-name" placeholder="输入店铺名称" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-inline">
+                <button class="layui-btn" lay-submit lay-filter="dashboard-search-submit" id="dashboard-search-btn">查询</button>
+              </div>
+            </div>
+          </form>
+
+          <table class="layui-hide" id="dashboard-store-table" lay-filter="dashboard-store-table"></table>
+          <div id="dashboard-store-pagebar"></div>
+          
+          <script type="text/html" id="dashboardBar">
+            <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="price_record">改价记录</a>
+            <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="stock_record">库存记录</a>
+            <a class="layui-btn layui-btn-xs" lay-event="link_store">关联店铺</a>
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['table', 'form', 'layer'], function(){
+  var table = layui.table;
+  var form = layui.form;
+  var layer = layui.layer;
+  var $ = layui.$;
+
+  // 获取查询参数
+  function getDashboardSearchParams(){
+    var params = {};
+    var storeName = $('#dashboard-store-name').val();
+    if(storeName) params.store_name = storeName;
+    params.group_by_store_name = true; // 固定参数
+    return params;
+  }
+
+  // 渲染主表（店铺列表）
+  function renderStoreTable(page, limit){
+    var params = getDashboardSearchParams();
+    page = page || 1;
+    limit = limit || 20;
+    
+    params.page = page;
+    params.limit = limit;
+    
+    getRequest('/index/getPriceChangeRecord', params, function(res){
+      if(res.code != 1){
+        layer.msg(res.msg || '获取数据失败', {icon: 2});
+        return;
+      }
+      var dataList = res.data.list || [];
+      var total = res.data.total || 0;
+      
+      table.render({
+        elem: '#dashboard-store-table',
+        data: dataList,
+        page: false, 
+        limit: limit,
+        cols: [[
+          {field: 'store_name', title: '店铺名称', width: 200, sort: true},
+                {field: 'store_number', title: '店铺编号', width: 200},
+                {field: 'store_acount', title: '店铺帐号', width: 200},
+          {field: 'count', title: 'SKU总数', width: 120, sort: true},
+          {title: '操作', toolbar: '#dashboardBar', minWidth: 200}
+        ]]
+      });
+
+      // 渲染分页
+      layui.laypage.render({
+        elem: 'dashboard-store-pagebar',
+        count: total,
+        curr: page,
+        limit: limit,
+        layout: ['count', 'prev', 'page', 'next', 'limit', 'skip'],
+        jump: function(obj, first){
+            if(!first){
+                renderStoreTable(obj.curr, obj.limit);
+            }
+        }
+      });
+    });
+  }
+
+  // 监听搜索
+  form.on('submit(dashboard-search-submit)', function(){
+    renderStoreTable(1, 20);
+    return false;
+  });
+
+  // 监听工具条
+  table.on('tool(dashboard-store-table)', function(obj){
+    var data = obj.data;
+    var event = obj.event;
+    
+    if(event === 'price_record'){
+      openDetailLayer('改价记录 - ' + data.store_name, 1, data.store_name);
+    } else if(event === 'stock_record'){
+      openDetailLayer('库存记录 - ' + data.store_name, 2, data.store_name);
+    } else if(event === 'link_store'){
+      openLinkStoreLayer(data.store_name);
+    }
+  });
+
+  // 打开关联店铺弹窗
+  function openLinkStoreLayer(currentStoreName){
+    var tableId = 'link-store-table-' + Date.now();
+    var pageId = 'link-store-pagebar-' + Date.now();
+    
+    layer.open({
+      type: 1,
+      title: '关联店铺 - 将店铺【' + currentStoreName + '】关联到OTP记录',
+      area: ['800px', '600px'],
+      content: `
+        <div style="padding: 20px;">
+          <form class="layui-form layui-form-pane" lay-filter="link-store-search-form" style="margin-bottom:12px;">
+            <div class="layui-form-item">
+              <div class="layui-inline">
+                <label class="layui-form-label">店铺编号</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" name="desc" placeholder="输入店铺编号" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-inline">
+                <button class="layui-btn" lay-submit lay-filter="link-store-search-submit">搜索</button>
+              </div>
+            </div>
+          </form>
+          <table id="${tableId}" lay-filter="${tableId}"></table>
+          <div id="${pageId}"></div>
+        </div>
+      `,
+      success: function(layero, index){
+        var searchParams = { limit: 10, page: 1 };
+        
+        // 渲染表格函数
+        var renderTable = function(params){
+          getRequest('/index/getOtps', params, function(res){
+            if(res.code != 1){
+              layer.msg(res.msg || '获取数据失败', {icon: 2});
+              return;
+            }
+            var dataList = res.data.list || [];
+            var total = res.data.total || 0;
+            
+            table.render({
+              elem: '#' + tableId,
+              data: dataList,
+              page: false,
+              limit: params.limit,
+              cols: [[
+                {field: 'id', title: 'ID', width: 80},
+                {field: 'desc', title: '店铺编号', width: 120},
+                {field: 'acount', title: '店铺帐号', width: 200},
+                {field: 'store_name', title: '店铺名称', width: 200},
+                {title: '操作', width: 100, templet: function(d){
+                    return '<a class="layui-btn layui-btn-xs" lay-event="select">选择</a>';
+                }}
+              ]],
+              done: function(){
+                // 绑定选择事件
+                table.on('tool('+tableId+')', function(obj){
+                  if(obj.event === 'select'){
+                    layer.confirm('确定要将OTP记录(ID:'+obj.data.id+')的店铺名称修改为“'+currentStoreName+'”吗？', function(idx){
+                      // 调用编辑接口
+                      postRequest('/index/editOtp', {
+                        id: obj.data.id,
+                        store_name: currentStoreName
+                      }, function(editRes){
+                        if(editRes.code == 1){
+                          layer.msg('关联成功', {icon: 1});
+                          layer.close(index); // 关闭弹窗
+                        } else {
+                          layer.msg(editRes.msg || '关联失败', {icon: 2});
+                        }
+                      });
+                      layer.close(idx);
+                    });
+                  }
+                });
+              }
+            });
+
+            // 渲染分页
+            layui.laypage.render({
+              elem: pageId,
+              count: total,
+              curr: params.page,
+              limit: params.limit,
+              layout: ['count', 'prev', 'page', 'next'],
+              jump: function(obj, first){
+                if(!first){
+                  var newParams = Object.assign({}, params, {page: obj.curr, limit: obj.limit});
+                  renderTable(newParams);
+                }
+              }
+            });
+          });
+        };
+
+        // 初始渲染
+        renderTable(searchParams);
+
+        // 监听搜索
+        form.on('submit(link-store-search-submit)', function(data){
+          var field = data.field;
+          var newParams = { limit: 10, page: 1 };
+          if(field.desc) newParams.desc = field.desc;
+          renderTable(newParams);
+          return false;
+        });
+        
+        // 渲染表单
+        form.render();
+      }
+    });
+  }
+
+  // 打开详情弹窗
+  // type: 1=改价, 2=库存
+  function openDetailLayer(title, type, storeName){
+    var tableId = 'detail-table-' + Date.now();
+    var pageId = 'detail-page-' + Date.now();
+    
+    layer.open({
+      type: 1,
+      title: title,
+      area: ['90%', '90%'],
+      content: '<div style="padding: 20px;"><table id="'+tableId+'" lay-filter="'+tableId+'"></table><div id="'+pageId+'"></div></div>',
+      success: function(layero, index){
+        renderDetailTable(tableId, pageId, type, storeName, 1);
+      }
+    });
+  }
+
+  // 渲染二级列表（SKU维度）
+  function renderDetailTable(tableId, pageId, type, storeName, page){
+    var limit = 20;
+    var params = {
+      type: type,
+      store_name: storeName,
+      group_by_sku: true,
+      limit: limit,
+      page: page
+    };
+
+    // 定义列
+    var cols = [];
+    if(type === 1){ // 改价记录
+      cols = [[
+        {field: 'sku', title: 'SKU', width: 150},
+        {field: 'product_title', title: '产品标题', width: 300},
+        {field: 'asin', title: 'ASIN', width: 120},
+        {field: 'region_name', title: '站点', width: 100},
+        {field: 'original_price', title: '最新原价', width: 100},
+        {field: 'new_price', title: '最新新价', width: 100},
+        {field: 'count', title: '改价次数', width: 100, sort: true},
+        {field: 'created_time', title: '最近修改时间', width: 160},
+        {title: '操作', templet: '<div><a class="layui-btn layui-btn-xs" lay-event="view_history">查看详情</a></div>', width: 100}
+      ]];
+    } else { // 库存记录
+      cols = [[
+        {field: 'sku', title: 'SKU', width: 150},
+        {field: 'product_title', title: '产品标题', width: 300},
+        {field: 'asin', title: 'ASIN', width: 120},
+        {field: 'region_name', title: '站点', width: 100},
+        {field: 'stock', title: '最新库存', width: 100},
+        {field: 'count', title: '变动次数', width: 100, sort: true},
+        {field: 'created_time', title: '最近修改时间', width: 160},
+        {title: '操作', templet: '<div><a class="layui-btn layui-btn-xs" lay-event="view_history">查看详情</a></div>', width: 100}
+      ]];
+    }
+
+    getRequest('/index/getPriceChangeRecord', params, function(res){
+      if(res.code != 1){
+        layer.msg(res.msg || '加载失败', {icon: 2});
+        return;
+      }
+      var list = res.data.list || [];
+      var total = res.data.total || 0;
+
+      table.render({
+        elem: '#' + tableId,
+        data: list,
+        cols: cols,
+        limit: limit,
+        page: false,
+        height: 'full-300', // 适应弹窗高度
+        done: function(){
+            // 绑定工具条事件
+            table.on('tool('+tableId+')', function(obj){
+              if(obj.event === 'view_history'){
+                toggleHistoryRow(obj, type);
+              }
+            });
+        }
+      });
+      
+      // 渲染分页
+      layui.laypage.render({
+        elem: pageId,
+        count: total,
+        curr: page,
+        limit: limit,
+        layout: ['count', 'prev', 'page', 'next', 'refresh', 'skip'],
+        jump: function(obj, first){
+          if(!first){
+            renderDetailTable(tableId, pageId, type, storeName, obj.curr);
+          }
+        }
+      });
+    });
+  }
+
+  // 展开/折叠 三级详情（流水）
+  function toggleHistoryRow(obj, type){
+    var data = obj.data;
+    var tr = obj.tr;
+    // 使用确定性 ID，移除 Date.now()
+    var rowId = 'history-row-' + data.sku.replace(/[^a-zA-Z0-9]/g, '') + '-' + type;
+    
+    var detailRow = $('#'+rowId);
+    var btn = tr.find('a[lay-event="view_history"]');
+
+    if(detailRow.length > 0){
+       // 已存在 -> 收起
+       detailRow.remove();
+       btn.text('查看详情');
+       return;
+    }
+
+    // 不存在 -> 展开
+    btn.text('收起详情');
+
+    var colspan = tr.find('td').length;
+    var detailHtml = '<tr id="'+rowId+'" class="detail-row"><td colspan="'+colspan+'" style="padding: 10px; background-color: #fcfcfc;"><div style="padding: 10px; border: 1px solid #eee; background: #fff;"><h4>SKU: '+data.sku+' 的'+(type===1?'改价':'库存')+'记录明细</h4><table id="table-'+rowId+'"></table></div></td></tr>';
+    
+    tr.after(detailHtml);
+    // data.isExpanded = true; // 不需要依赖 data 状态了，直接依赖 DOM
+
+    // 查询明细
+    var detailParams = {
+      type: type,
+      sku: data.sku,
+      // group_by_sku: false, 
+      limit: 50
+    };
+
+    getRequest('/index/getPriceChangeRecord', detailParams, function(res){
+      if(res.code == 1){
+        var detailList = res.data.list || [];
+        var detailCols = [];
+        if(type === 1){
+          detailCols = [[
+            {field:'created_time', title:'修改时间', width:160},
+            {field:'original_price', title:'原价', width:100},
+            {field:'new_price', title:'新价', width:100},
+            {field:'operator_username', title:'操作人', width:120}
+          ]];
+        } else {
+           detailCols = [[
+            {field:'created_time', title:'修改时间', width:160},
+            {field:'stock', title:'库存', width:100},
+            {field:'operator_username', title:'操作人', width:120}
+          ]];
+        }
+
+        table.render({
+          elem: '#table-' + rowId,
+          data: detailList,
+          cols: detailCols,
+          page: false,
+          size: 'sm'
+        });
+      } else {
+        layer.msg('加载明细失败');
+        // 加载失败，移除行并恢复按钮
+        $('#'+rowId).remove();
+        btn.text('查看详情');
+      }
+    });
+  }
+
+  // 初始化加载主表
+  renderStoreTable(1, 20);
+});
+</script>

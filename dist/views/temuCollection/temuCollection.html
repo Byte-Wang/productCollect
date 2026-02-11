@@ -1,0 +1,224 @@
+<div class="layui-fluid" id="temuCollectionTable">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-body">
+          <form class="layui-form layui-form-pane" lay-filter="temu-search-form" id="temu-search-form" style="margin-bottom:12px;">
+            <div class="layui-form-item">
+              <div class="layui-inline">
+                <label class="layui-form-label">创建时间</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="temu-create-start-date" placeholder="开始时间" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="temu-create-end-date" placeholder="结束时间" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">日销量</label>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" id="temu-daily-sales-min" placeholder="最小" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" id="temu-daily-sales-max" placeholder="最大" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">评分</label>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" step="0.01" id="temu-rating-min" placeholder="最低" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="number" step="0.01" id="temu-rating-max" placeholder="最高" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">创建人</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <select id="temu-created-by" name="created_by_user_id">
+                    <option value="0">全部</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <button class="layui-btn" lay-submit lay-filter="temu-search-submit" id="temu-search-btn">查询</button>
+                <button class="layui-btn layui-btn-primary" id="temu-export-btn">导出</button>
+              </div>
+            </div>
+          </form>
+
+          <table class="layui-hide" id="temu-collection-table" lay-filter="temu-collection-table"></table>
+          <div class="layui-card" id="temu-collection-pagebar"></div>
+
+          <script type="text/html" id="imgTpl">
+            <div style="display:flex;align-items:center;">
+              <img src="{{ d.main_image_url }}" style="width:60px;height:60px;object-fit:cover;border:1px solid #eee;border-radius:4px;" />
+            </div>
+          </script>
+
+          <script type="text/html" id="detailLinkTpl">
+            <a href="{{ d.detail_page_url }}" target="_blank" style="color:#1E9FFF;">{{ d.product_id }}</a>
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentPageSize = 10;
+
+function getTemuSearchParams(){
+  var params = {};
+  var start = document.getElementById('temu-create-start-date') ? document.getElementById('temu-create-start-date').value : '';
+  var end = document.getElementById('temu-create-end-date') ? document.getElementById('temu-create-end-date').value : '';
+  var dsMin = document.getElementById('temu-daily-sales-min') ? document.getElementById('temu-daily-sales-min').value : '';
+  var dsMax = document.getElementById('temu-daily-sales-max') ? document.getElementById('temu-daily-sales-max').value : '';
+  var ratingMin = document.getElementById('temu-rating-min') ? document.getElementById('temu-rating-min').value : '';
+  var ratingMax = document.getElementById('temu-rating-max') ? document.getElementById('temu-rating-max').value : '';
+  var createdBy = document.getElementById('temu-created-by') ? document.getElementById('temu-created-by').value : '';
+
+  if (start) params.created_time_start = start;
+  if (end) params.created_time_end = end;
+  if (dsMin) params.daily_sales_min = Number(dsMin);
+  if (dsMax) params.daily_sales_max = Number(dsMax);
+  if (ratingMin) params.rating_min = Number(ratingMin);
+  if (ratingMax) params.rating_max = Number(ratingMax);
+  if (createdBy) params.created_by_user_id = createdBy;
+  return params;
+}
+
+function renderTemuCollectionTable(params){
+  var table = layui.table;
+  var laypage = layui.laypage;
+  if (params.type != "export") {
+    currentPageSize = params.limit;
+  }
+
+  if (params.type == "export") {
+    var exportParams = Object.assign({}, params);
+    getBlobRequest("/index/exportTemuGoodsRecord", exportParams, function(response){
+      try {
+        if (response && response.blob) {
+          const blob = new Blob([response.blob], {
+            type: response.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = response.filename || 'Temu商品数据.xlsx';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          layer.msg('导出成功', { icon: 1, time: 2000 });
+        } else {
+          layer.msg(response && response.msg ? response.msg : '导出失败：返回数据格式错误', { icon: 2, time: 2000 });
+        }
+      } catch(e) {
+        console.error('导出失败:', e);
+        layer.msg('导出失败: ' + e.message, { icon: 2, time: 2000 });
+      }
+    });
+    return;
+  }
+
+  getRequest('/index/getTemuGoodsRecord', params, function(res){
+    if (res.code != 1) {
+      layer.msg(res.msg || '数据获取失败', {offset:'15px', icon:2, time:1000});
+      return;
+    }
+    var cloudData = res.data || {list:[], total:0};
+
+    table.render({
+      elem: '#temu-collection-table',
+      data: cloudData.list,
+      title: 'Temu商品数据',
+      cellMinWidth: 60,
+      page: false,
+      limit: params.limit,
+      cols: [[
+        {field:'id', title:'ID', width:90},
+        {field:'main_image_url', title:'图片', width:100, templet:'#imgTpl'},
+        {field:'product_id', title:'产品ID', width:160, templet:'#detailLinkTpl'},
+        {field:'title', title:'标题', width:300},
+        {field:'price', title:'价格', width:90},
+        {field:'site', title:'站点', width:80},
+        {field:'daily_sales', title:'日销量', width:100},
+        {field:'total_sales', title:'总销量', width:110},
+        {field:'rating', title:'评分', width:90},
+        {field:'category', title:'类目', width:180},
+        {field:'created_time', title:'创建时间', width:160},
+        {field:'listing_time', title:'上架时间', width:160},
+        {field:'created_by_username', title:'创建人', width:120},
+        {field:'status', title:'状态', width:90}
+      ]],
+      done: function(res, curr, count){
+        // 可添加滚动或其他效果
+      }
+    });
+
+    laypage.render({
+      elem: 'temu-collection-pagebar',
+      count: cloudData.total,
+      curr: params.page,
+      limit: params.limit,
+      limits: [10,20,50,100],
+      layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip'],
+      jump: function(obj){
+        var sp = getTemuSearchParams();
+        if (params.page == obj.curr && params.limit == obj.limit) return;
+        renderTemuCollectionTable(Object.assign({}, sp, {page: obj.curr, limit: obj.limit}));
+      }
+    });
+  });
+}
+
+layui.use(['table','form','laypage','laydate'], function(){
+  var form = layui.form, laydate = layui.laydate;
+
+  laydate.render({ elem: '#temu-create-start-date', type: 'datetime' });
+  laydate.render({ elem: '#temu-create-end-date', type: 'datetime' });
+
+  function fillCreatedByOptions(list){
+    var sel = layui.$('#temu-created-by');
+    sel.empty();
+    sel.append(new Option('全部', 0));
+    list.forEach(function(team){
+      sel.append(new Option(team.nickname, team.id));
+    });
+    form.render('select');
+  }
+
+  if (window.serviceData && Array.isArray(serviceData.authList) && serviceData.authList.length){
+    fillCreatedByOptions(serviceData.authList);
+  } else if (typeof addListen === 'function') {
+    addListen(function(key, value){
+      if (key === 'authList' && Array.isArray(value)){
+        fillCreatedByOptions(value);
+      }
+    });
+  }
+
+  $('#temu-export-btn').click(function(){
+    var sp = getTemuSearchParams();
+    renderTemuCollectionTable(Object.assign({page: 1, limit: 99999, type: 'export'}, sp));
+    return false;
+  });
+
+  form.on('submit(temu-search-submit)', function(){
+    var sp = getTemuSearchParams();
+    renderTemuCollectionTable(Object.assign({page:1, limit: currentPageSize}, sp));
+    return false;
+  });
+
+  renderTemuCollectionTable(Object.assign({page:1, limit: currentPageSize}, getTemuSearchParams()));
+});
+</script>

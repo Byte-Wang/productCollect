@@ -1,0 +1,467 @@
+<div class="layui-fluid" id="stationTable">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <form class="layui-form" action="" lay-filter="component-form-group">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <button type="button" class="layui-btn" id="addStationBtn">新增</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <table class="layui-hide" id="station-table" lay-filter="station-table"></table>
+                    <div class="layui-card" id="station-pagebar"></div>
+
+                    <script type="text/html" id="operationTpl">
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+
+                    <script type="text/html" id="stationFormTpl">
+                      <form class="layui-form" id="stationForm" lay-filter="stationForm" style="padding: 20px;">
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">配置名称</label>
+                          <div class="layui-input-block">
+                            <input type="text" name="title" required lay-verify="required" placeholder="请输入配置名称" class="layui-input">
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">汇率</label>
+                          <div class="layui-input-block">
+                            <input type="number" name="rate" required lay-verify="required" placeholder="请输入汇率" class="layui-input">
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">配置值1</label>
+                          <div class="layui-input-block">
+                            <input type="number" name="value_a" required lay-verify="required" placeholder="请输入配置值1" class="layui-input">
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">配置值2</label>
+                          <div class="layui-input-block">
+                            <input type="number" name="value_b" required lay-verify="required" placeholder="请输入配置值2" class="layui-input">
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">配置值3</label>
+                          <div class="layui-input-block">
+                            <input type="number" name="value_c" required lay-verify="required" placeholder="请输入配置值3" class="layui-input">
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">配置值4</label>
+                          <div class="layui-input-block">
+                            <input type="number" name="value_d" required lay-verify="required" placeholder="请输入配置值4" class="layui-input">
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">配置值5</label>
+                          <div class="layui-input-block">
+                            <input type="number" name="value_e" required lay-verify="required" placeholder="请输入配置值5" class="layui-input">
+                          </div>
+                        </div>
+                        
+                        <!-- 配置限制部分 -->
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">配置限制</label>
+                          <div class="layui-input-block">
+                            <div class="limit-item">
+                              <div class="layui-form-mid">当售价小于</div>
+                              <div class="layui-input-inline" style="width: 100px;">
+                                <input type="number" name="sale_limit" required lay-verify="required" placeholder="输入数值" class="layui-input">
+                              </div>
+                              <div class="layui-form-mid">时，不可提交</div>
+                            </div>
+                            
+                            <div id="purchase-limits">
+                              <div class="limit-item" style="margin-top: 10px;">
+                                <div class="layui-form-mid">当进价小于</div>
+                                <div class="layui-input-inline" style="width: 100px;">
+                                  <input type="number" name="purchase_limit_price" required lay-verify="required" placeholder="输入数值" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid">，比例需大于等于</div>
+                                <div class="layui-input-inline" style="width: 100px;">
+                                  <input type="number" name="purchase_limit_ratio" required lay-verify="required" placeholder="输入数值" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid">才可提交</div>
+                                <button type="button" class="layui-btn layui-btn-xs" onclick="window.addPurchaseLimit()">添加</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- 比例系数配置 -->
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">比例系数配置1</label>
+                          <div class="layui-input-block">
+                            <input type="number" name="coefficient_a" required lay-verify="required" placeholder="请输入比例系数配置1" class="layui-input">
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">比例系数配置2</label>
+                          <div class="layui-input-block">
+                            <input type="number" name="coefficient_b" required lay-verify="required" placeholder="请输入比例系数配置2" class="layui-input">
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">比例系数配置3</label>
+                          <div class="layui-input-block">
+                            <input type="number" name="coefficient_c" required lay-verify="required" placeholder="请输入比例系数配置3" class="layui-input">
+                          </div>
+                        </div>
+
+                        <!-- 比例限制 -->
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">比例限制</label>
+                          <div class="layui-input-block">
+                            <div class="limit-item">
+                              <div class="layui-form-mid">当比例系数小于</div>
+                              <div class="layui-input-inline" style="width: 100px;">
+                                <input type="number" name="coefficient_limit" required lay-verify="required" placeholder="输入数值" class="layui-input">
+                              </div>
+                              <div class="layui-form-mid">时，不可提交</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                          <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="stationFormSubmit">保存</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                          </div>
+                        </div>
+                      </form>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentPageSize = 10;
+
+layui.use(['admin', 'table', 'form', 'laydate'], function(){
+    var admin = layui.admin
+    ,setter = layui.setter
+    ,table = layui.table
+    ,element = layui.element
+    ,layer = layui.layer
+    ,laydate = layui.laydate
+    ,form = layui.form
+    ,$ = layui.$;
+
+    console.log("station.html load");
+
+    // 添加进价限制的函数
+    window.addPurchaseLimit = function(price = '', ratio = '') {
+        let newLimit = `
+            <div class="limit-item purchase-limit-group" style="margin-top: 10px;">
+                <div class="layui-form-mid">当进价小于</div>
+                <div class="layui-input-inline" style="width: 100px;">
+                    <input type="number" name="purchase_limit_price_${Date.now()}" required lay-verify="required" value="${price}" placeholder="输入数值" class="layui-input">
+                </div>
+                <div class="layui-form-mid">，比例需大于等于</div>
+                <div class="layui-input-inline" style="width: 100px;">
+                    <input type="number" name="purchase_limit_ratio_${Date.now()}" required lay-verify="required" value="${ratio}" placeholder="输入数值" class="layui-input">
+                </div>
+                <div class="layui-form-mid">才可提交</div>
+                <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" onclick="window.removePurchaseLimit(this)">删除</button>
+            </div>
+        `;
+        $('#purchase-limits').append(newLimit);
+        form.render();
+    };
+
+    // 添加删除规则的函数
+    window.removePurchaseLimit = function(elem) {
+        var $ = layui.$;
+        $(elem).closest('.purchase-limit-group').remove();
+        form.render();
+    };
+
+    // 修改表单模板中的添加按钮
+    let stationFormTpl = $('#stationFormTpl').html().replace(
+        'onclick="addPurchaseLimit()"',
+        'onclick="window.addPurchaseLimit()"'
+    );
+    $('#stationFormTpl').html(stationFormTpl);
+
+    // 抽取构建提交数据的方法
+    function buildSubmitData(field, originalData = null) {
+        // 构建限制数组
+        let limit_array = [
+            {
+                type: 'sale',
+                confine: field.sale_limit,
+                result: "0"
+            }
+        ];
+
+        // 获取默认的第一条进价限制
+        let defaultPrice = $('[name="purchase_limit_price"]').val();
+        let defaultRatio = $('[name="purchase_limit_ratio"]').val();
+        if(defaultPrice && defaultRatio) {
+            limit_array.push({
+                type: 'purchase',
+                result: defaultPrice,
+                confine: defaultRatio
+            });
+        }
+
+        // 获取所有动态添加的进价限制
+        $('.purchase-limit-group').each(function(){
+            let price = $(this).find('input[name^="purchase_limit_price"]').val();
+            let ratio = $(this).find('input[name^="purchase_limit_ratio"]').val();
+            if(price && ratio) {
+                limit_array.push({
+                    type: 'purchase',
+                    result: price,
+                    confine: ratio
+                });
+            }
+        });
+
+        // 构建比例限制数组
+        let coefficient_limit_array = [{
+            type: 'coefficient',
+            confine: field.coefficient_limit,
+            result: "0"
+        }];
+
+        // 构建基本数据
+        let submitData = {
+            title: field.title,
+            rate: field.rate,
+            value_a: field.value_a,
+            value_b: field.value_b,
+            value_c: field.value_c,
+            value_d: field.value_d,
+            value_e: field.value_e,
+            coefficient_a: field.coefficient_a,
+            coefficient_b: field.coefficient_b,
+            coefficient_c: field.coefficient_c,
+            status: "1",
+            limit_array: limit_array,
+            coefficient_limit_array: coefficient_limit_array
+        };
+
+        // 如果是编辑模式，添加额外字段
+        if (originalData) {
+            submitData.id = originalData.id;
+            submitData.createtime = originalData.createtime;
+            submitData.updatetime = originalData.updatetime;
+        }
+
+        return submitData;
+    }
+
+    // 抽取表单初始化方法
+    function initStationForm(data = null) {
+        // 初始化基本表单
+        form.render();
+
+        if (data) {
+            // 填充基本表单数据
+            form.val('stationForm', {
+                title: data.title,
+                rate: data.rate,
+                value_a: data.value_a,
+                value_b: data.value_b,
+                value_c: data.value_c,
+                value_d: data.value_d,
+                value_e: data.value_e,
+                coefficient_a: data.coefficient_a,
+                coefficient_b: data.coefficient_b,
+                coefficient_c: data.coefficient_c
+            });
+
+            // 处理配置限制
+            if (data.limit_array && Array.isArray(data.limit_array)) {
+                data.limit_array.forEach((limit, index) => {
+                    if (limit.type === 'sale') {
+                        $('[name="sale_limit"]').val(limit.confine);
+                    } else if (limit.type === 'purchase') {
+                        if (index === 1) {
+                            $('[name="purchase_limit_price"]').val(limit.result);
+                            $('[name="purchase_limit_ratio"]').val(limit.confine);
+                        } else if (index > 1) {
+                            addPurchaseLimit(limit.result, limit.confine);
+                        }
+                    }
+                });
+            }
+
+            // 处理比例限制
+            if (data.coefficient_limit_array && data.coefficient_limit_array.length > 0) {
+                $('[name="coefficient_limit"]').val(data.coefficient_limit_array[0].confine);
+            }
+        }
+
+        // 重新渲染表单
+        form.render();
+    }
+
+    // 抽取表单提交处理方法
+    function handleFormSubmit(url, data = null) {
+        form.on('submit(stationFormSubmit)', function(formData){
+            let submitData = buildSubmitData(formData.field, data);
+            
+            postRequest(url, submitData, function(res){
+                if(res.code == 1){
+                    layer.msg(res.msg, {icon: 1});
+                    layer.closeAll('page');
+                    renderStationTable({page: 1, limit: currentPageSize});
+                } else {
+                    layer.msg(res.msg || '操作失败', {icon: 2});
+                }
+            });
+            return false;
+        });
+    }
+
+    // 渲染表格方法
+    function renderStationTable(params) {
+        var laypage = layui.laypage;
+        
+        currentPageSize = params.limit;
+
+        getRequest("/station/index", params, (res) => {
+            if (res.code != 1) {
+                if (res.code == 302) {
+                    window.location.href = "/#/user/login"
+                }
+                layer.msg(res.msg || '数据获取失败', {
+                    offset: '15px'
+                    ,icon: 2
+                    ,time: 1000
+                });
+                return;
+            }
+
+            console.log("取到列表：", res);
+            var cloudData = res.data;
+
+            table.render({
+                elem: '#station-table'
+                ,data: cloudData.list
+                ,title: '站点配置数据'
+                ,cellMinWidth: 80
+                ,cols: [[
+                    {field:'id', title:'ID', width:60},
+                    {field:'title', title:'配置名称', width:100},
+                    {field:'rate', title:'汇率', width:80},
+                    {field:'value_a', title:'配置值1', width:100},
+                    {field:'value_b', title:'配置值2', width:100},
+                    {field:'value_c', title:'配置值3', width:100},
+                    {field:'value_d', title:'配置值4', width:100},
+                    {field:'value_e', title:'配置值5', width:100},
+                    {field:'coefficient_a', title:'比例系数配置1', width:120},
+                    {field:'coefficient_b', title:'比例系数配置2', width:120},
+                    {field:'coefficient_c', title:'比例系数配置3', width:120},
+                    {field:'createtime', title:'创建时间', width:160, templet: function(d){
+                        return layui.util.toDateString(d.createtime * 1000, 'yyyy-MM-dd HH:mm:ss');
+                    }},
+                    {field:'updatetime', title:'更新时间', width:160, templet: function(d){
+                        return layui.util.toDateString(d.updatetime * 1000, 'yyyy-MM-dd HH:mm:ss');
+                    }},
+                    {title:'操作', width:120, templet:'#operationTpl', fixed:'right'}
+                ]]
+            });
+
+            laypage.render({
+                elem: "station-pagebar"
+                ,count: cloudData.total
+                ,curr: params.page
+                ,limit: params.limit
+                ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                ,jump: function(obj){
+                    if (params.page == obj.curr && params.limit == obj.limit) {
+                        return;
+                    }
+                    params.page = obj.curr;
+                    params.limit = obj.limit;
+                    renderStationTable(params);
+                }
+            });
+        });
+    }
+
+    // 新增按钮点击事件
+    $('#addStationBtn').on('click', function(){
+        layer.open({
+            type: 1,
+            title: '新增站点配置',
+            area: ['800px', '800px'],
+            content: $('#stationFormTpl').html(),
+            success: function(){
+                initStationForm();
+                handleFormSubmit("/station/add");
+            }
+        });
+    });
+
+    // 表格工具条事件
+    table.on('tool(station-table)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'edit'){
+            layer.open({
+                type: 1,
+                title: '编辑站点配置',
+                area: ['800px', '800px'],
+                content: $('#stationFormTpl').html(),
+                success: function(){
+                    initStationForm(data);
+                    handleFormSubmit("/station/edit", data);
+                }
+            });
+        } else if(obj.event === 'del'){
+            layer.confirm('确定要删除该站点配置吗？', {
+                btn: ['确定','取消']
+            }, function(){
+                delRequest("/station/del", {
+                    ids: [data.id]
+                }, function(res){
+                    if(res.code == 1){
+                        layer.msg(res.msg, {icon: 1});
+                        renderStationTable({page: 1, limit: currentPageSize});
+                    } else {
+                        layer.msg(res.msg || '删除失败', {icon: 2});
+                    }
+                });
+            });
+        }
+    });
+
+    // 初始化表格
+    renderStationTable({page: 1, limit: 10});
+});
+</script>
+
+<style>
+.limit-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+.limit-item .layui-form-mid {
+    margin: 0 8px;
+    white-space: nowrap;
+}
+.layui-input-block {
+    width: 90%;
+}
+.layui-form-label {
+    width: 110px;
+}
+.layui-input-block {
+    margin-left: 140px;
+}
+.layui-input-inline {
+    margin-right: 0;
+}
+</style>

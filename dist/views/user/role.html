@@ -1,0 +1,470 @@
+<div class="layui-fluid" id="roleTable">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <form class="layui-form" action="" lay-filter="component-form-group">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <button type="button" class="layui-btn" id="addRoleBtn">新增</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <table class="layui-hide" id="role-table" lay-filter="role-table"></table>
+                    <div class="layui-card" id="role-pagebar"></div>
+
+                    <script type="text/html" id="operationTpl">
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+
+                    <!-- 添加角色弹窗表单模板 -->
+                    <script type="text/html" id="roleFormTpl">
+                      <form class="layui-form" id="roleForm" lay-filter="roleForm" style="padding: 20px;">
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">上级角色</label>
+                          <div class="layui-input-block">
+                            <select name="pid" lay-verify="required">
+                              <option value="0">无上级角色</option>
+                              <!-- 选项将通过 JavaScript 动态添加 -->
+                            </select>
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">角色名称</label>
+                          <div class="layui-input-block">
+                            <input type="text" name="name" required lay-verify="required" placeholder="请输入角色名称" class="layui-input">
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">权限规则</label>
+                          <div class="layui-input-block">
+                            <div id="authTree"></div>
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <label class="layui-form-label">状态</label>
+                          <div class="layui-input-block">
+                            <input type="radio" name="status" value="1" title="启用" checked>
+                            <input type="radio" name="status" value="0" title="禁用">
+                          </div>
+                        </div>
+                        <div class="layui-form-item">
+                          <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="roleFormSubmit">保存</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                          </div>
+                        </div>
+                      </form>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentPageSize = 10;
+
+layui.use(['admin', 'table', 'form', 'laydate', 'treeTable'], function(){
+    var admin = layui.admin
+    ,setter = layui.setter
+    ,table = layui.table
+    ,treeTable = layui.treeTable
+    ,element = layui.element
+    ,layer = layui.layer
+    ,laydate = layui.laydate
+    ,form = layui.form
+    ,$ = layui.$;
+
+    console.log("role.html load");
+
+    // 将 authTreeData 移到这里，使其在整个模块内可用
+    let authTreeData = [
+        {
+            title: '首页',
+            id: 1,
+            children: []
+        },
+        {
+            title: '系统管理',
+            id: 2,
+            children: [
+                {
+                    title: '角色管理',
+                    id: 3,
+                    children: [
+                        {title: '查看', id: 4},
+                        {title: '添加', id: 5},
+                        {title: '编辑', id: 6},
+                        {title: '删除', id: 7}
+                    ]
+                },
+                {
+                    title: '员工管理',
+                    id: 8,
+                    children: [
+                        {title: '查看', id: 9},
+                        {title: '添加', id: 10},
+                        {title: '编辑', id: 11},
+                        {title: '删除', id: 12}
+                    ]
+                },
+                {
+                    title: '菜单规则管理',
+                    id: 13,
+                    children: [
+                        {title: '查看', id: 14},
+                        {title: '添加', id: 15},
+                        {title: '编辑', id: 16},
+                        {title: '快速排序', id: 18}
+                    ]
+                },
+                {
+                    title: '管理员日志管理',
+                    id: 19,
+                    children: [
+                        {title: '查看', id: 20}
+                    ]
+                },
+                {
+                    title: '团队管理',
+                    id: 90,
+                    children: [
+                        {title: '查看', id: 91},
+                        {title: '添加', id: 92},
+                        {title: '编辑', id: 93},
+                        {title: '删除', id: 94},
+                        {title: '快速排序', id: 95}
+                    ]
+                },
+                {
+                    title: '配置比例管理',
+                    id: 114,
+                    children: [
+                        {title: '查看', id: 115},
+                        {title: '添加', id: 116},
+                        {title: '编辑', id: 117},
+                        {title: '删除', id: 118}
+                    ]
+                }
+            ]
+        },
+        {title: '会员管理', id: 21, children: []},
+        {title: '常规管理', id: 44, children: []},
+        {title: '数据安全管理', id: 55, children: []},
+        {title: 'BuildAdmin', id: 76, children: []},
+        {
+            title: '个人产品列表',
+            id: 96,
+            children: [
+                {title: '查看', id: 97},
+                {title: '添加', id: 98},
+                {title: '编辑', id: 99},
+                {title: '删除', id: 100},
+                {title: '快速排序', id: 101},
+                {title: '产品审核', id: 121},
+                {title: '导入', id: 122},
+                {title: '导出', id: 123},
+                {title: '分配', id: 124}
+            ]
+        },
+        {title: '团队产品列表', id: 120, children: []}
+    ];
+
+    function renderRoleTable(params) {
+        var laypage = layui.laypage;
+        
+        currentPageSize = params.limit;
+
+        getRequest("/auth.group/index", params, (res) => {
+            if (res.code != 1) {
+                if (res.code == 302) {
+                    window.location.href = "/#/user/login"
+                }
+                layer.msg(res.msg || '数据获取失败', {
+                    offset: '15px'
+                    ,icon: 2
+                    ,time: 1000
+                });
+                return;
+            }
+
+            console.log("取到列表：", res);
+            var cloudData = res.data;
+
+            treeTable.render({
+                elem: '#role-table'
+                ,data: cloudData.list
+                ,title: '角色数据'
+                ,cellMinWidth: 60
+                ,cellMinHeight: 100
+                ,tree: {
+                    iconIndex: 2
+                }
+                ,cols: [[
+                    {type: 'checkbox', fixed: 'left'},
+                    {field:'id', title:'ID', width:90, fixed: 'left'},
+                    {field:'name', title:'角色名称', width:150},
+                    {field:'rules', title:'权限规则', width:200},
+                    {field:'createtime', title:'创建时间', width:180, templet: function(d){
+                        return layui.util.toDateString(d.createtime * 1000, 'yyyy-MM-dd HH:mm:ss');
+                    }},
+                    {field:'updatetime', title:'更新时间', width:180, templet: function(d){
+                        return layui.util.toDateString(d.updatetime * 1000, 'yyyy-MM-dd HH:mm:ss');
+                    }},
+                    {field:'status', title:'状态', width:90, templet: function(d){
+                        if (d.status == 1) {
+                            return '<span class="layui-badge layui-bg-green">启用</span>';
+                        } else if (d.status == 0) {
+                            return '<span class="layui-badge layui-bg-red">禁用</span>';
+                        }
+                    }},
+                    {title:'操作', width:150, templet:'#operationTpl', fixed:'right'}
+                ]]
+            });
+
+            laypage.render({
+                elem: "role-pagebar"
+                ,count: cloudData.total || cloudData.list.length
+                ,curr: params.page
+                ,limit: params.limit
+                ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                ,jump: function(obj){
+                    console.log('当前在第'+ params.page + '页，目标是第'+obj.curr+'页')
+                    if (params.page == obj.curr && params.limit == obj.limit) {
+                        console.log('不加载')
+                        return;
+                    }
+                    console.log('开始加载')
+                    params.page = obj.curr;
+                    params.limit = obj.limit;
+                    renderRoleTable(params);
+                }
+            });
+        });
+    }
+
+    // 初始化表格
+    renderRoleTable({page: 1, limit: 10});
+
+    // 新增按钮点击事件
+    $('#addRoleBtn').on('click', function(){
+        layer.open({
+            type: 1,
+            title: '新增角色',
+            area: ['500px', '680px'],
+            content: $('#roleFormTpl').html(),
+            success: function(){
+                // 初始化表单
+                form.render();
+                
+                // 初始化上级角色下拉框
+                getRequest("/auth.group/index", {}, function(res){
+                    if(res.code == 1){
+                        let selectEl = $('[name="pid"]');
+                        // 递归处理角色列表，将所有角色都添加到下拉框中
+                        function addRoleOptions(roles, level = 0) {
+                            roles.forEach(role => {
+                                // 添加缩进效果
+                                let prefix = new Array(level + 1).join('　');
+                                selectEl.append(`<option value="${role.id}">${prefix}${role.name}</option>`);
+                                // 如果有子角色，递归处理
+                                if (role.children && role.children.length > 0) {
+                                    addRoleOptions(role.children, level + 1);
+                                }
+                            });
+                        }
+                        addRoleOptions(res.data.list);
+                        form.render('select');
+                    }
+                });
+
+                // 初始化权限树
+                layui.tree.render({
+                    elem: '#authTree',
+                    data: authTreeData,
+                    showCheckbox: true,
+                    id: 'authTreeId'
+                });
+            }
+        });
+    });
+
+    // 表单提交事件
+    form.on('submit(roleFormSubmit)', function(data){
+        let field = data.field;
+        
+        // 获取选中的权限规则
+        let checkedData = layui.tree.getChecked('authTreeId');
+        let rules = [];
+        let half_rules = [];
+        
+        // 递归获取选中的节点ID
+        function getCheckedIds(nodes) {
+            nodes.forEach(node => {
+                rules.push(node.id);
+                if(node.children) {
+                    getCheckedIds(node.children);
+                }
+            });
+        }
+        
+        getCheckedIds(checkedData);
+        
+        // 构建提交数据
+        let submitData = {
+            pid: field.pid,
+            name: field.name,
+            status: field.status,
+            rules: rules,
+            half_rules: half_rules
+        };
+        
+        postRequest("/auth.group/add", submitData, function(res){
+            if(res.code == 1){
+                layer.msg(res.msg, {icon: 1});
+                layer.closeAll('page');
+                // 刷新表格
+                renderRoleTable({page: 1, limit: currentPageSize});
+            } else {
+                layer.msg(res.msg || '添加失败', {icon: 2});
+            }
+        });
+        return false;
+    });
+
+    // 监听工具条事件
+    treeTable.on('tool(role-table)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'edit'){
+            // 先获取详细信息
+            getRequest("/auth.group/edit", {id: data.id}, function(res) {
+                if(res.code !== 1) {
+                    layer.msg(res.msg || '获取角色信息失败', {icon: 2});
+                    return;
+                }
+                
+                const roleData = res.data.row;
+                
+                layer.open({
+                    type: 1,
+                    title: '编辑角色',
+                    area: ['500px', '680px'],
+                    content: $('#roleFormTpl').html(),
+                    success: function(){
+                        // 初始化表单
+                        form.render();
+                        
+                        // 初始化上级角色下拉框
+                        getRequest("/auth.group/index", {}, function(res){
+                            if(res.code == 1){
+                                let selectEl = $('[name="pid"]');
+                                function addRoleOptions(roles, level = 0) {
+                                    roles.forEach(role => {
+                                        if(role.id !== roleData.id) {
+                                            let prefix = new Array(level + 1).join('　');
+                                            selectEl.append(`<option value="${role.id}">${prefix}${role.name}</option>`);
+                                            if (role.children && role.children.length > 0) {
+                                                addRoleOptions(role.children, level + 1);
+                                            }
+                                        }
+                                    });
+                                }
+                                selectEl.append('<option value="0">无上级角色</option>');
+                                addRoleOptions(res.data.list);
+                                selectEl.val(roleData.pid);
+                                form.render('select');
+                            }
+                        });
+
+                        // 初始化权限树
+                        layui.tree.render({
+                            elem: '#authTree',
+                            data: authTreeData,
+                            showCheckbox: true,
+                            id: 'authTreeId'
+                        });
+
+                        // 设置权限树选中状态
+                        setTimeout(() => {
+                            if(roleData.rules && Array.isArray(roleData.rules)) {
+                                roleData.rules.forEach(ruleId => {
+                                    layui.tree.setChecked('authTreeId', [parseInt(ruleId)]);
+                                });
+                            }
+                        }, 100);
+
+                        // 填充表单数据
+                        form.val('roleForm', {
+                            name: roleData.name,
+                            status: roleData.status.toString()
+                        });
+
+                        // 监听表单提交
+                        form.on('submit(roleFormSubmit)', function(formData){
+                            let field = formData.field;
+                            field.id = roleData.id;
+                            
+                            // 获取选中的权限规则
+                            let checkedData = layui.tree.getChecked('authTreeId');
+                            let rules = [];
+                            
+                            function getCheckedIds(nodes) {
+                                nodes.forEach(node => {
+                                    rules.push(node.id);
+                                    if(node.children) {
+                                        getCheckedIds(node.children);
+                                    }
+                                });
+                            }
+                            
+                            getCheckedIds(checkedData);
+                            
+                            // 构建提交数据
+                            let submitData = {
+                                id: field.id,
+                                pid: field.pid,
+                                name: field.name,
+                                status: field.status,
+                                rules: rules,
+                                half_rules: [],
+                                createtime: roleData.createtime,
+                                updatetime: roleData.updatetime
+                            };
+
+                            postRequest("/auth.group/edit", submitData, function(res){
+                                if(res.code == 1){
+                                    layer.msg(res.msg, {icon: 1});
+                                    layer.closeAll('page');
+                                    renderRoleTable({page: 1, limit: currentPageSize});
+                                } else {
+                                    layer.msg(res.msg || '更新失败', {icon: 2});
+                                }
+                            });
+                            return false;
+                        });
+                    }
+                });
+            });
+        } else if(obj.event === 'del'){
+            layer.confirm('确定要删除该角色吗？', {
+                btn: ['确定','取消']
+            }, function(){
+                delRequest("/auth.group/del", {
+                    ids: [data.id]
+                }, function(res){
+                    if(res.code == 1){
+                        layer.msg(res.msg, {icon: 1});
+                        // 刷新表格
+                        renderRoleTable({page: 1, limit: currentPageSize});
+                    } else {
+                        layer.msg(res.msg || '删除失败', {icon: 2});
+                    }
+                });
+            });
+        }
+    });
+});
+</script>
