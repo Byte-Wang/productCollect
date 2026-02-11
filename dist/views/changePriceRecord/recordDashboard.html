@@ -165,16 +165,16 @@ layui.use(['table', 'form', 'layer'], function(){
                 {field: 'id', title: 'ID', width: 80},
                 {field: 'desc', title: '店铺编号', width: 120},
                 {field: 'acount', title: '店铺帐号', width: 200},
-                {field: 'store_name', title: '店铺名称', width: 200},
+                {field: 'store_name', title: '已关联店铺名称', width: 200},
                 {title: '操作', width: 100, templet: function(d){
-                    return '<a class="layui-btn layui-btn-xs" lay-event="select">选择</a>';
+                    return '<a class="layui-btn layui-btn-xs" lay-event="select">关联该店铺</a>';
                 }}
               ]],
               done: function(){
                 // 绑定选择事件
                 table.on('tool('+tableId+')', function(obj){
                   if(obj.event === 'select'){
-                    layer.confirm('确定要将OTP记录(ID:'+obj.data.id+')的店铺名称修改为“'+currentStoreName+'”吗？', function(idx){
+                    layer.confirm('确定要将店铺名称为“'+currentStoreName+'”的店铺关联到店铺编号“'+obj.data.desc+'”吗？', function(idx){
                       // 调用编辑接口
                       postRequest('/index/editOtp', {
                         id: obj.data.id,
