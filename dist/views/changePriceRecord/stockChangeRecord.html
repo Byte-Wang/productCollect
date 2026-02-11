@@ -168,7 +168,7 @@ function renderStockChangeRecordTable(params){
   }
 
   // 主表查询，添加 group_by_sku=true
-  var mainParams = Object.assign({}, params, { group_by_sku: true });
+  var mainParams = Object.assign({}, params, { /*group_by_sku: false*/ });
 
   getRequest('/index/getPriceChangeRecord', mainParams, function(res){
     if (res.code != 1) {
@@ -191,11 +191,11 @@ function renderStockChangeRecordTable(params){
         {field:'asin', title:'ASIN', width:120},
         {field:'region_name', title:'站点', width:160},
         {field:'stock', title:'最新库存', width:100},
-        {field:'count', title:'库存变化次数', width:130, sort: true},
+        // {field:'count', title:'库存变化次数', width:130, sort: true},
         {field:'store_name', title:'店铺', width:160},
         {field:'operator_username', title:'操作人', width:120},
         {field:'created_time', title:'最近修改时间', width:160, sort: true},
-        {title: '操作', toolbar: '#stockChangeBar', width: 100, fixed: 'right'}
+        // {title: '操作', toolbar: '#stockChangeBar', width: 100, fixed: 'right'}
       ]],
       done: function(res, curr, count){
         // 
