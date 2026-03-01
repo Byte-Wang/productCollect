@@ -1,0 +1,237 @@
+<div class="layui-fluid" id="brandBlacklistContainer">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-body">
+          <form class="layui-form layui-form-pane" lay-filter="brand-blacklist-search-form" id="brand-blacklist-search-form" style="margin-bottom:12px;">
+            <div class="layui-form-item">
+              <div class="layui-inline">
+                <label class="layui-form-label">创建时间</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="brand-blacklist-create-start-date" placeholder="开始时间" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="brand-blacklist-create-end-date" placeholder="结束时间" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">品牌名称</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="brand-blacklist-brand-name" placeholder="品牌名称" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">站点</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="brand-blacklist-site" placeholder="站点" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">创建者</label>
+                <div class="layui-input-inline" style="width:180px;">
+                  <input type="text" id="brand-blacklist-creator-name" placeholder="创建者名称" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <button class="layui-btn" lay-submit lay-filter="brand-blacklist-search-submit" id="brand-blacklist-search-btn">查询</button>
+                <button class="layui-btn layui-btn-normal" id="brand-blacklist-add-btn">新增</button>
+              </div>
+            </div>
+          </form>
+
+          <table class="layui-hide" id="brand-blacklist-table" lay-filter="brand-blacklist-table"></table>
+          <div class="layui-card" id="brand-blacklist-pagebar"></div>
+
+          <script type="text/html" id="brandBlacklistActionTpl">
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let brandBlacklistPageSize = 10;
+
+function getBrandBlacklistSearchParams(){
+  var params = {};
+  var start = document.getElementById('brand-blacklist-create-start-date') ? document.getElementById('brand-blacklist-create-start-date').value : '';
+  var end = document.getElementById('brand-blacklist-create-end-date') ? document.getElementById('brand-blacklist-create-end-date').value : '';
+  var brandName = document.getElementById('brand-blacklist-brand-name') ? document.getElementById('brand-blacklist-brand-name').value : '';
+  var site = document.getElementById('brand-blacklist-site') ? document.getElementById('brand-blacklist-site').value : '';
+  var creatorName = document.getElementById('brand-blacklist-creator-name') ? document.getElementById('brand-blacklist-creator-name').value : '';
+
+  if (start) params.create_time_start = start;
+  if (end) params.create_time_end = end;
+  if (brandName) params.brand_name = brandName;
+  if (site) params.site = site;
+  if (creatorName) params.creator_name = creatorName;
+  return params;
+}
+
+function renderBrandBlacklistTable(params){
+  var table = layui.table;
+  var laypage = layui.laypage;
+  if (params.type != 'export') {
+    brandBlacklistPageSize = params.limit;
+  }
+
+  getRequest('/index/getBrandBlacklist', params, function(res){
+    if (res.code != 1) {
+      layer.msg(res.msg || '数据获取失败', {offset:'15px', icon:2, time:1000});
+      return;
+    }
+    var cloudData = res.data || {list:[], total:0};
+
+    table.render({
+      elem: '#brand-blacklist-table',
+      data: cloudData.list,
+      title: '品牌黑名单数据',
+      cellMinWidth: 60,
+      page: false,
+      limit: params.limit,
+      cols: [[
+        {field:'id', title:'ID', width:90},
+        {field:'brand_name', title:'品牌名称', width:200},
+        {field:'site', title:'站点', width:120},
+        {field:'creator_name', title:'创建者', width:120},
+        {field:'create_time', title:'创建时间', width:160},
+        {field:'remark', title:'备注', width:300},
+        {title:'操作', width:100, toolbar: '#brandBlacklistActionTpl'}
+      ]],
+      done: function(res, curr, count){
+        // 可添加滚动或其他效果
+      }
+    });
+
+    laypage.render({
+      elem: 'brand-blacklist-pagebar',
+      count: cloudData.total,
+      curr: params.page,
+      limit: params.limit,
+      limits: [10,20,50,100],
+      layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip'],
+      jump: function(obj){
+        var sp = getBrandBlacklistSearchParams();
+        if (params.page == obj.curr && params.limit == obj.limit) return;
+        renderBrandBlacklistTable(Object.assign({}, sp, {page: obj.curr, limit: obj.limit}));
+      }
+    });
+  });
+}
+
+// 打开新增黑名单弹窗
+function openAddBrandBlacklistDialog(){
+  var content = `
+    <form class="layui-form" style="padding: 20px;" lay-filter="add-brand-blacklist-form">
+      <div class="layui-form-item">
+        <label class="layui-form-label">品牌名称<span style="color:red;">*</span></label>
+        <div class="layui-input-block">
+          <input type="text" name="brand_name" required lay-verify="required" placeholder="请输入品牌名称" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">站点</label>
+        <div class="layui-input-block">
+          <input type="text" name="site" placeholder="请输入站点" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+          <textarea name="remark" placeholder="请输入黑名单原因备注" class="layui-textarea"></textarea>
+        </div>
+      </div>
+    </form>
+  `;
+
+  layer.open({
+    type: 1,
+    title: '新增品牌黑名单',
+    area: ['500px', '350px'],
+    content: content,
+    btn: ['确定', '取消'],
+    success: function(layero, index){
+      layui.form.render(null, 'add-brand-blacklist-form');
+    },
+    yes: function(index, layero){
+      var brandName = layero.find('input[name="brand_name"]').val().trim();
+      var site = layero.find('input[name="site"]').val().trim();
+      var remark = layero.find('textarea[name="remark"]').val().trim();
+
+      if (!brandName) {
+        layer.msg('品牌名称不能为空', {icon: 2, time: 2000});
+        return;
+      }
+
+      postRequest('/index/addBrandBlacklist', {
+        brand_name: brandName,
+        site: site,
+        remark: remark
+      }, function(res){
+        if (res.code === 1) {
+          layer.msg('添加成功', {icon: 1, time: 2000});
+          layer.close(index);
+          // 刷新列表
+          var sp = getBrandBlacklistSearchParams();
+          renderBrandBlacklistTable(Object.assign({page: 1, limit: brandBlacklistPageSize}, sp));
+        } else {
+          layer.msg(res.msg || '添加失败', {icon: 2, time: 2000});
+        }
+      });
+    }
+  });
+}
+
+// 删除黑名单
+function deleteBrandBlacklist(id){
+  layer.confirm('确定要删除这条黑名单记录吗？', function(index){
+    postRequest('/index/deleteBrandBlacklist', {id: id}, function(res){
+      if (res.code === 1) {
+        layer.msg('删除成功', {icon: 1, time: 2000});
+        // 刷新列表
+        var sp = getBrandBlacklistSearchParams();
+        renderBrandBlacklistTable(Object.assign({page: 1, limit: brandBlacklistPageSize}, sp));
+      } else {
+        layer.msg(res.msg || '删除失败', {icon: 2, time: 2000});
+      }
+    });
+    layer.close(index);
+  });
+}
+
+layui.use(['table','form','laypage','laydate'], function(){
+  var form = layui.form, laydate = layui.laydate;
+
+  laydate.render({ elem: '#brand-blacklist-create-start-date', type: 'datetime' });
+  laydate.render({ elem: '#brand-blacklist-create-end-date', type: 'datetime' });
+
+  // 新增按钮点击事件
+  layui.$('#brand-blacklist-add-btn').click(function(){
+    openAddBrandBlacklistDialog();
+    return false;
+  });
+
+  // 监听行工具事件
+  layui.table.on('tool(brand-blacklist-table)', function(obj){
+    var data = obj.data;
+    if(obj.event === 'del'){
+      deleteBrandBlacklist(data.id);
+    }
+  });
+
+  form.on('submit(brand-blacklist-search-submit)', function(){
+    var sp = getBrandBlacklistSearchParams();
+    renderBrandBlacklistTable(Object.assign({page:1, limit: brandBlacklistPageSize}, sp));
+    return false;
+  });
+
+  renderBrandBlacklistTable(Object.assign({page:1, limit: brandBlacklistPageSize}, getBrandBlacklistSearchParams()));
+});
+</script>
