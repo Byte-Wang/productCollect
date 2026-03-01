@@ -1097,6 +1097,47 @@ layui.use(['admin', 'table', 'form', 'laydate'], function(){
 
                   console.log("提交表单数据：", data.field);  // 添加日志
                   
+                  // 获取品牌名称和站点
+                  var brandName = $(data.form).find('input[name="brand"]').val().trim();
+                  var stationId = $(data.form).find('select[name="station_id"]').val();
+                  var stationName = $(data.form).find('select[name="station_id"] option:selected').text();
+
+                  // 校验品牌黑名单
+                  if (brandName) {
+                    getRequest('/index/getBrandBlacklist', {brand_name: brandName}, function(res){
+                      if (res.code === 1 && res.data && res.data.list && res.data.list.length > 0) {
+                        var blacklist = res.data.list;
+                        var isBlacklisted = false;
+                        
+                        // 判断是否在黑名单中
+                        for (var i = 0; i < blacklist.length; i++) {
+                          var item = blacklist[i];
+                          // 如果站点匹配或者黑名单中的站点为空，则认为是黑名单品牌
+                          if (item.site === stationName || !item.site || item.site === '') {
+                            isBlacklisted = true;
+                            break;
+                          }
+                        }
+
+                        if (isBlacklisted) {
+                          layer.msg('品牌已列入黑名单，无法添加', {icon: 2, time: 3000});
+                          return;
+                        }
+                      }
+                      
+                      // 通过黑名单校验，继续提交
+                      submitProductForm(data);
+                    });
+                  } else {
+                    // 没有品牌名称，直接提交
+                    submitProductForm(data);
+                  }
+
+                  return false;
+                });
+
+                // 提交产品表单
+                function submitProductForm(data) {
                   // 获取当前用户信息
                   var userInfo = layui.data('layuiAdmin').userInfo;
                   
@@ -1130,9 +1171,7 @@ layui.use(['admin', 'table', 'form', 'laydate'], function(){
                           layer.msg(res.msg || '添加失败', {icon: 2});
                       }
                   });
-
-                  return false;
-                });
+                }
 
             }
           });
