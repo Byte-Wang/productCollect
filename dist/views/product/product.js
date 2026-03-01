@@ -22,6 +22,11 @@ function getSearchParams() {
   if (formData.product_name != "") {
     searchList.push('{"field":"product_name","val":"' + formData.product_name + '","operator":"LIKE"}');
   }
+
+  // 产品名称
+  if (formData.brand != "") {
+    searchList.push('{"field":"brand","val":"' + formData.brand + '","operator":"LIKE"}');
+  }
   
   // 状态
   if (formData.state != "") {
@@ -71,7 +76,7 @@ const defaultCols = [
   //{field:'category', title:'类目', width:120},
   {field:'product_name', title:'产品名称', width:200},
   {field:'station_name', title:'站点', width:90},
-  {field:'brand', title:'品牌', width:120},
+  {field:'brand', title:'品牌', width:250, templet: '#brandTpl'},
   {field:'weight', title:'重量(g)', width:80},
   {field:'rate', title:'汇率', width:70},
   {field:'purchase_price', title:'进价', width:70},
@@ -1333,5 +1338,59 @@ layui.use(['admin', 'table', 'form', 'laydate'], function(){
     console.log('已清空select input内容');
   });
 
+  // 监听添加到黑名单按钮点击事件
+  $(document).on('click', '.add-blacklist-btn', function() {
+    var brandName = $(this).data('brand');
+    var siteName = $(this).data('site');
+
+    if (!brandName) {
+      layer.msg('品牌名称不能为空', {icon: 2, time: 2000});
+      return;
+    }
+
+    var content = `
+      <form class="layui-form" style="padding: 20px;">
+        <div class="layui-form-item">
+          <label class="layui-form-label">确认信息</label>
+          <div class="layui-input-block">
+            <p style="margin-top: 10px;">是否确认把 <strong>${siteName}</strong> 站点的 <strong>"${brandName}"</strong> 品牌加入黑名单？</p>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">黑名单原因</label>
+          <div class="layui-input-block">
+            <textarea name="remark" placeholder="请输入黑名单原因（可选）" class="layui-textarea"></textarea>
+          </div>
+        </div>
+      </form>
+    `;
+
+    layer.open({
+      type: 1,
+      title: '添加到黑名单',
+      area: ['500px', '300px'],
+      content: content,
+      btn: ['确认', '取消'],
+      success: function(layero, index) {
+        form.render();
+      },
+      yes: function(index, layero) {
+        var remark = layero.find('textarea[name="remark"]').val();
+
+        postRequest("/index/addBrandBlacklist", {
+          brand_name: brandName,
+          site: siteName,
+          remark: remark
+        }, function(res) {
+          if (res.code === 1) {
+            layer.msg('添加成功', {icon: 1, time: 2000});
+            layer.close(index);
+          } else {
+            layer.msg(res.msg || '添加失败', {icon: 2, time: 2000});
+          }
+        });
+      }
+    });
+  });
 
 });

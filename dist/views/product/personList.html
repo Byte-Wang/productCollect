@@ -198,6 +198,13 @@
             <span>{{ d.state == '0' ? '待审核' : (d.state == '1' ? '初审通过' : (d.state == '2' ? '驳回' : (d.state == '3' ? '合格' : (d.state == '4' ? '待二审' : (d.state == '5' ? '异议二审' : '无效数据')))))}}</span>
           </script>
 
+          <script type="text/html" id="brandTpl">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span>{{ d.brand }}</span>
+              <button class="layui-btn layui-btn-xs layui-btn-danger add-blacklist-btn" data-brand="{{ d.brand }}" data-site="{{ d.station_name }}">添加到黑名单</button>
+            </div>
+          </script>
+
         </div>
       </div>
     </div>
